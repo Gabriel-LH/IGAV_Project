@@ -12,6 +12,10 @@ import {
   X,
   Sparkles,
   Clock,
+  Printer,
+  FileText,
+  Send,
+  MessageSquare,
   User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,6 +29,8 @@ interface OrderManagementProps {
   isOpenNewModal: boolean;
   setIsOpenNewModal: (open: boolean) => void;
   onAddOrder: (order: Order) => void;
+  onDownloadPdf?: (order: Order) => void;
+  onSendWhatsApp?: (order: Order) => void;
 }
 
 export const OrderManagement: React.FC<OrderManagementProps> = ({
@@ -33,7 +39,9 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
   customers,
   isOpenNewModal,
   setIsOpenNewModal,
-  onAddOrder
+  onAddOrder,
+  onDownloadPdf,
+  onSendWhatsApp
 }) => {
   // Form State
   const [selectedCustomerId, setSelectedCustomerId] = useState<number>(
@@ -53,11 +61,14 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
 
   const handleCustomerChange = (customerId: number) => {
     setSelectedCustomerId(customerId);
-    const c = customers.find((cust) => cust.id === Number(customerId));
+    const c = customers.find((cust) => cust.id === Number(customerId)) as any;
     if (c) {
-      setClienteNombre(c.nombreCompleto);
-      setClienteDocumento(c.numeroDocumento);
-      setClienteTelefono(c.telefono);
+      const telStr = typeof c.telefono === 'object' && c.telefono !== null ? (c.telefono.value || '') : (c.telefono || '');
+      const numDocStr = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null ? (c.documentoIdentidad.numero || '') : (c.numeroDocumento || '');
+      const nameStr = c.nombreCompleto || `${c.nombres || ''} ${c.apellidos || ''}`.trim() || 'Cliente';
+      setClienteNombre(nameStr);
+      setClienteDocumento(numDocStr);
+      setClienteTelefono(telStr);
     }
   };
 
@@ -183,6 +194,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                 <th className="p-3.5 text-right">Alquiler (S/)</th>
                 <th className="p-3.5 text-right">Garantía (S/)</th>
                 <th className="p-3.5 text-center">Estado</th>
+                <th className="p-3.5 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -214,6 +226,24 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                       }`}>
                         {order.estado === 'EN_ALQUILAR' ? 'EN USO' : order.estado}
                       </span>
+                    </td>
+                    <td className="p-3.5 text-center">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => onDownloadPdf?.(order)}
+                          className="p-1.5 bg-stone-800/60 hover:bg-amber-500/20 text-stone-300 hover:text-amber-400 border border-stone-700/50 rounded-lg transition-all"
+                          title="Descargar Contrato PDF & Recibo Garantía"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => onSendWhatsApp?.(order)}
+                          className="p-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg transition-all"
+                          title="Enviar Alerta WhatsApp (wsp-js)"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -253,11 +283,22 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
                     onChange={(e) => handleCustomerChange(Number(e.target.value))}
                     className="w-full px-3 py-2 rounded-lg bg-[var(--card-bg)] border border-[var(--glass-border)] text-[var(--text-primary)] font-medium"
                   >
-                    {customers.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.nombreCompleto} ({c.tipoDocumento}: {c.numeroDocumento}) - [{c.categoriaCliente}]
-                      </option>
-                    ))}
+                    {customers.map((c: any) => {
+                      const docTipoStr = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
+                        ? (c.documentoIdentidad.tipo || 'DNI')
+                        : (typeof c.tipoDocumento === 'string' ? c.tipoDocumento : 'DNI');
+                      const docNumStr = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
+                        ? (c.documentoIdentidad.numero || '')
+                        : (typeof c.numeroDocumento === 'string' ? c.numeroDocumento : '');
+                      const nameStr = c.nombreCompleto || `${c.nombres || ''} ${c.apellidos || ''}`.trim() || 'Cliente';
+                      const catStr = typeof c.categoriaCliente === 'string' ? c.categoriaCliente : 'REGULAR';
+
+                      return (
+                        <option key={c.id} value={c.id}>
+                          {nameStr} ({docTipoStr}: {docNumStr}) - [{catStr}]
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 

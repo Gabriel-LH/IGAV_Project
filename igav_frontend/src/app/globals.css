@@ -165,3 +165,25 @@ input::placeholder, textarea::placeholder {
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-contract,
+  #printable-contract * {
+    visibility: visible;
+  }
+  #printable-contract {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 15mm;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}

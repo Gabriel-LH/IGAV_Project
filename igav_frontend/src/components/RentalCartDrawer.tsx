@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShoppingBag, 
   X, 
@@ -48,6 +48,12 @@ export const RentalCartDrawer: React.FC<RentalCartDrawerProps> = ({
   
   // Existing customer selection
   const [selectedCustomerId, setSelectedCustomerId] = useState<number>(customers[0]?.id || 0);
+
+  useEffect(() => {
+    if ((!selectedCustomerId || selectedCustomerId === 0) && customers.length > 0) {
+      setSelectedCustomerId(customers[0].id);
+    }
+  }, [customers, selectedCustomerId]);
   
   // New customer inputs
   const [newNombre, setNewNombre] = useState('');
@@ -81,16 +87,24 @@ export const RentalCartDrawer: React.FC<RentalCartDrawerProps> = ({
     let createdCustomer: Customer | undefined = undefined;
 
     if (customerMode === 'EXISTING') {
-      const existing = customers.find(c => c.id === Number(selectedCustomerId));
+      const existing = customers.find(c => c.id === Number(selectedCustomerId)) || customers[0];
       if (!existing) {
         toast.error('Por favor seleccione un cliente de la lista');
         return;
       }
+      const existingTel = typeof existing.telefono === 'object' && existing.telefono !== null
+        ? ((existing.telefono as any).value || '')
+        : (typeof existing.telefono === 'string' ? existing.telefono : '');
+      const existingDoc = typeof (existing as any).documentoIdentidad === 'object' && (existing as any).documentoIdentidad !== null
+        ? ((existing as any).documentoIdentidad.numero || '')
+        : (typeof existing.numeroDocumento === 'string' ? existing.numeroDocumento : '');
+      const existingNombre = existing.nombreCompleto || `${existing.nombres || ''} ${existing.apellidos || ''}`.trim() || 'Cliente Gala';
+
       customerObj = {
         id: existing.id,
-        nombreCompleto: existing.nombreCompleto,
-        numeroDocumento: existing.numeroDocumento,
-        telefono: existing.telefono
+        nombreCompleto: existingNombre,
+        numeroDocumento: existingDoc,
+        telefono: existingTel
       };
     } else {
       if (!newNombre || !newNumDoc) {
@@ -333,11 +347,24 @@ export const RentalCartDrawer: React.FC<RentalCartDrawerProps> = ({
                       onChange={(e) => setSelectedCustomerId(Number(e.target.value))}
                       className="w-full px-3 py-2.5 rounded-xl bg-black/5 dark:bg-[var(--glass-bg)] border border-[var(--glass-border)] text-xs font-medium text-[var(--text-primary)]"
                     >
-                      {customers.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.nombreCompleto} ({c.tipoDocumento}: {c.numeroDocumento}) • {c.telefono}
-                        </option>
-                      ))}
+                      {customers.map((c: any) => {
+                        const telStr = typeof c.telefono === 'object' && c.telefono !== null
+                          ? (c.telefono.value || c.telefono.numeroFormateado || '')
+                          : (typeof c.telefono === 'string' ? c.telefono : '');
+                        const docTipoStr = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
+                          ? (c.documentoIdentidad.tipo || 'DNI')
+                          : (typeof c.tipoDocumento === 'string' ? c.tipoDocumento : 'DNI');
+                        const docNumStr = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
+                          ? (c.documentoIdentidad.numero || '')
+                          : (typeof c.numeroDocumento === 'string' ? c.numeroDocumento : '');
+                        const nameStr = c.nombreCompleto || `${c.nombres || ''} ${c.apellidos || ''}`.trim() || 'Cliente';
+
+                        return (
+                          <option key={c.id} value={c.id}>
+                            {nameStr} ({docTipoStr}: {docNumStr}) {telStr ? `• ${telStr}` : ''}
+                          </option>
+                        );
+                      })}
                     </select>
                   </div>
                 ) : (

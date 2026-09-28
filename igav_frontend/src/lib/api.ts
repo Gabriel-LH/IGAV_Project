@@ -326,15 +326,96 @@ export async function fetchGarmentsByStore(storeId: number = 1): Promise<Garment
   return mockGarments;
 }
 
+function normalizeCustomer(c: any): Customer {
+  const tel = typeof c.telefono === 'object' && c.telefono !== null
+    ? (c.telefono.value || c.telefono.numeroFormateado || '')
+    : (typeof c.telefono === 'string' ? c.telefono : '');
+
+  const emailStr = typeof c.email === 'object' && c.email !== null
+    ? (c.email.email || '')
+    : (typeof c.email === 'string' ? c.email : '');
+
+  const tipoDoc = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
+    ? (c.documentoIdentidad.tipo || 'DNI')
+    : (c.tipoDocumento || 'DNI');
+
+  const numDoc = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
+    ? (c.documentoIdentidad.numero || '')
+    : (c.numeroDocumento || '');
+
+  const nombreCompleto = c.nombreCompleto || `${c.nombres || ''} ${c.apellidos || ''}`.trim() || 'Cliente';
+
+  const direccionStr = typeof c.address === 'object' && c.address !== null
+    ? `${c.address.calle || ''}, ${c.address.distrito || ''}`.trim()
+    : (typeof c.direccion === 'string' ? c.direccion : 'San Isidro, Lima');
+
+  return {
+    id: c.id,
+    tipoDocumento: tipoDoc,
+    numeroDocumento: numDoc,
+    nombres: c.nombres || nombreCompleto.split(' ')[0] || 'Cliente',
+    apellidos: c.apellidos || nombreCompleto.split(' ').slice(1).join(' ') || '',
+    nombreCompleto,
+    email: emailStr,
+    telefono: tel,
+    direccion: direccionStr,
+    categoriaCliente: c.categoriaCliente || 'REGULAR',
+    totalAlquileres: c.totalAlquileres || 1,
+    calificacion: c.calificacion || 5.0,
+    fechaRegistro: c.fechaRegistro || '2026-09-28'
+  };
+}
+
+function normalizeStore(s: any): Store {
+  const tel = typeof s.telefono === 'object' && s.telefono !== null
+    ? (s.telefono.value || s.telefono.numeroFormateado || '')
+    : (typeof s.telefono === 'string' ? s.telefono : '');
+
+  const direccionStr = typeof s.address === 'object' && s.address !== null
+    ? `${s.address.calle || ''}, ${s.address.distrito || ''}`.trim()
+    : (typeof s.direccion === 'string' ? s.direccion : 'Lima, Perú');
+
+  return {
+    id: s.id,
+    codigoTenant: s.codigoTenant || `TENANT-00${s.id}`,
+    nombre: s.nombre || s.nombreComercial || 'Sede Principal',
+    direccion: direccionStr,
+    telefono: tel,
+    ciudad: s.ciudad || (s.address ? s.address.departamento : 'Lima'),
+    esSedePrincipal: s.esSedePrincipal ?? (s.id === 1)
+  };
+}
+
+function normalizeUser(u: any): User {
+  const emailStr = typeof u.email === 'object' && u.email !== null
+    ? (u.email.email || '')
+    : (typeof u.email === 'string' ? u.email : '');
+
+  const nombreCompleto = u.nombreCompleto || `${u.nombres || ''} ${u.apellidos || ''}`.trim() || 'Usuario Staff';
+
+  return {
+    id: u.id,
+    username: u.username || emailStr.split('@')[0] || `user_${u.id}`,
+    nombreCompleto,
+    email: emailStr,
+    rol: (u.globalRole || u.rol || 'VENDEDOR') as any,
+    storeId: u.store?.id || u.storeId || 1,
+    storeNombre: u.store?.nombreComercial || u.storeNombre || 'Sede Central',
+    activo: u.statusUser === 'ACTIVO' || u.activo !== false
+  };
+}
+
 export async function fetchCustomers(): Promise<Customer[]> {
   try {
     const res = await fetch(`${API_BASE}/customers`);
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map(normalizeCustomer);
+      }
     }
   } catch (e) {
-    console.warn('API error');
+    console.warn('API error en customers');
   }
   return mockCustomers;
 }
@@ -344,10 +425,12 @@ export async function fetchStores(): Promise<Store[]> {
     const res = await fetch(`${API_BASE}/stores`);
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map(normalizeStore);
+      }
     }
   } catch (e) {
-    console.warn('API error');
+    console.warn('API error en stores');
   }
   return mockStores;
 }
@@ -357,10 +440,12 @@ export async function fetchUsers(): Promise<User[]> {
     const res = await fetch(`${API_BASE}/users`);
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map(normalizeUser);
+      }
     }
   } catch (e) {
-    console.warn('API error');
+    console.warn('API error en users');
   }
   return mockUsers;
 }

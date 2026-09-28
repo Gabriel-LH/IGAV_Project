@@ -1,0 +1,25 @@
+{
+  "name": "igav-wsp-service",
+  "version": "1.0.0",
+  "description": "Microservicio de notificaciones automáticas por WhatsApp para IGAV SaaS con whatsapp-web.js (wsp-js)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  },
+  "keywords": [
+    "whatsapp",
+    "wsp-js",
+    "whatsapp-web.js",
+    "notifications",
+    "igav-saas"
+  ],
+  "author": "IGAV Development Team",
+  "license": "ISC"
+}

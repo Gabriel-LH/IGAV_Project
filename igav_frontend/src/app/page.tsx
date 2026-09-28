@@ -14,6 +14,9 @@ import { StoreManagement } from '@/components/StoreManagement';
 import { UserManagement } from '@/components/UserManagement';
 import { ReturnInspectionModal } from '@/components/ReturnInspectionModal';
 import { RentalCartDrawer } from '@/components/RentalCartDrawer';
+import { ContractPdfModal } from '@/components/ContractPdfModal';
+import { WhatsAppNotificationModal } from '@/components/WhatsAppNotificationModal';
+import { LoginModal, AuthSession } from '@/components/LoginModal';
 import { Garment, Customer, Order, Store, User, TailoringRecord, TailoringStatus, fetchGarmentsByStore, fetchCustomers, fetchStores, fetchUsers } from '@/lib/api';
 import { Toaster, toast } from 'sonner';
 import { useTheme } from 'next-themes';
@@ -267,6 +270,32 @@ export default function AppHome() {
   const [cart, setCart] = useState<Garment[]>([]);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
+  // Estados para las nuevas funcionalidades: JWT, PDF y WhatsApp (wsp-js)
+  const [userSession, setUserSession] = useState<AuthSession | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [selectedOrderForPdf, setSelectedOrderForPdf] = useState<Order | null>(null);
+  const [selectedOrderForWhatsApp, setSelectedOrderForWhatsApp] = useState<Order | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('igav_user');
+      if (savedUser) {
+        try {
+          setUserSession(JSON.parse(savedUser));
+        } catch (e) {
+          console.error('Error parseando sesión guardada', e);
+        }
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('igav_token');
+    localStorage.removeItem('igav_user');
+    setUserSession(null);
+    toast.info('Sesión cerrada correctamente');
+  };
+
   const currentStore = stores.find((s) => s.id === activeStoreId) || stores[0];
 
   useEffect(() => {
@@ -479,6 +508,9 @@ export default function AppHome() {
         isLoading={isLoading}
         cartCount={cart.length}
         onOpenCart={() => setIsCartOpen(true)}
+        userSession={userSession}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
+        onLogout={handleLogout}
       />
 
       <div className="flex-1 flex w-full">
@@ -535,6 +567,8 @@ export default function AppHome() {
               isOpenNewModal={isOpenNewOrderModal}
               setIsOpenNewModal={setIsOpenNewOrderModal}
               onAddOrder={handleAddOrder}
+              onDownloadPdf={(order) => setSelectedOrderForPdf(order)}
+              onSendWhatsApp={(order) => setSelectedOrderForWhatsApp(order)}
             />
           )}
 
@@ -598,6 +632,33 @@ export default function AppHome() {
         orders={orders}
         selectedOrderId={selectedReturnOrderId}
         onReturnProcessed={handleReturnProcessed}
+      />
+
+      {/* Modales de Valor Agregado: PDF de Contratos, Notificaciones WhatsApp y Login JWT */}
+      <ContractPdfModal
+        isOpen={!!selectedOrderForPdf}
+        onClose={() => setSelectedOrderForPdf(null)}
+        order={selectedOrderForPdf}
+        customer={customers.find(c => c.id === selectedOrderForPdf?.customerId)}
+        store={stores.find(s => s.id === selectedOrderForPdf?.storeId) || currentStore}
+        onSendWhatsApp={(order) => {
+          setSelectedOrderForPdf(null);
+          setSelectedOrderForWhatsApp(order);
+        }}
+      />
+
+      <WhatsAppNotificationModal
+        isOpen={!!selectedOrderForWhatsApp}
+        onClose={() => setSelectedOrderForWhatsApp(null)}
+        order={selectedOrderForWhatsApp}
+        customer={customers.find(c => c.id === selectedOrderForWhatsApp?.customerId)}
+        storeName={stores.find(s => s.id === selectedOrderForWhatsApp?.storeId)?.nombre || currentStore.nombre}
+      />
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={(session) => setUserSession(session)}
       />
     </div>
   );

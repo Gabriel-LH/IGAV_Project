@@ -203,29 +203,37 @@ export const CustomerManagement: React.FC<CustomerManagementProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {filteredCustomers.map((customer) => (
+              {filteredCustomers.map((customer: any) => {
+                const telStr = typeof customer.telefono === 'object' && customer.telefono !== null ? (customer.telefono.value || '') : (customer.telefono || '');
+                const emailStr = typeof customer.email === 'object' && customer.email !== null ? (customer.email.email || '') : (customer.email || '');
+                const docTipo = typeof customer.documentoIdentidad === 'object' && customer.documentoIdentidad !== null ? (customer.documentoIdentidad.tipo || 'DNI') : (customer.tipoDocumento || 'DNI');
+                const docNum = typeof customer.documentoIdentidad === 'object' && customer.documentoIdentidad !== null ? (customer.documentoIdentidad.numero || '') : (customer.numeroDocumento || '');
+                const dirStr = typeof customer.address === 'object' && customer.address !== null ? `${customer.address.calle || ''}, ${customer.address.distrito || ''}` : (typeof customer.direccion === 'string' ? customer.direccion : 'Lima');
+                const nameStr = customer.nombreCompleto || `${customer.nombres || ''} ${customer.apellidos || ''}`.trim() || 'Cliente';
+
+                return (
                 <tr key={customer.id} className="hover:bg-[var(--glass-bg)] transition-colors">
                   <td className="p-3.5 font-mono font-bold text-amber-800 dark:text-amber-300">
-                    <span className="text-[10px] text-[var(--text-secondary)] block">{customer.tipoDocumento}</span>
-                    {customer.numeroDocumento}
+                    <span className="text-[10px] text-[var(--text-secondary)] block">{docTipo}</span>
+                    {docNum}
                   </td>
                   <td className="p-3.5 font-semibold text-[var(--text-primary)]">
-                    {customer.nombreCompleto}
+                    {nameStr}
                   </td>
                   <td className="p-3.5 text-[var(--text-secondary)]">
                     <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
                       <Mail className="w-3 h-3 text-amber-700 dark:text-amber-400" />
-                      <span>{customer.email}</span>
+                      <span>{emailStr}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[var(--text-secondary)] text-[11px] mt-0.5">
                       <Phone className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />
-                      <span>{customer.telefono}</span>
+                      <span>{telStr}</span>
                     </div>
                   </td>
                   <td className="p-3.5 text-[var(--text-secondary)] max-w-xs truncate">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-3 h-3 text-[var(--text-secondary)] shrink-0" />
-                      <span>{customer.direccion}</span>
+                      <span>{dirStr}</span>
                     </div>
                   </td>
                   <td className="p-3.5 text-center">
@@ -256,7 +264,8 @@ export const CustomerManagement: React.FC<CustomerManagementProps> = ({
                     )}
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

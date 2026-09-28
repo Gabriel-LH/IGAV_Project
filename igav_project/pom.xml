@@ -137,6 +137,29 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.12.0</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<charset>UTF-8</charset>
+					<doclint>none</doclint>
+					<failOnError>false</failOnError>
+					<show>package</show>
+					<windowtitle>IGAV SaaS - Manual Técnico y Documentación API</windowtitle>
+					<doctitle>IGAV SaaS (Integrated Garment &amp; Apparel Management) - Manual Javadoc</doctitle>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-javadoc</id>
+						<phase>package</phase>
+						<goals>
+							<goal>javadoc</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
