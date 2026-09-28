@@ -1,5 +1,6 @@
 package com.igav.igav_project.Model.Entity.User;
 
+import com.igav.igav_project.Model.Entity.Store.Store;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
@@ -8,14 +9,25 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 
 import jakarta.persistence.*;
 
+/**
+ * Entidad JPA que representa a un Usuario dentro del sistema I.G.A.V.
+ * Puede pertenecer a una tienda específica o ser un Administrador Global.
+ * Cumple con los requerimientos RF-01 y RF-02.
+ *
+ * @author IGAV Development Team
+ */
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "nombres", nullable = false, length = 100)
     private String nombres;
+
+    @Column(name = "apellidos", nullable = false, length = 100)
     private String apellidos;
 
     @Embedded
@@ -23,14 +35,18 @@ public class User {
     private Email email;
 
     @Embedded
-    @Column(name = "documento_identidad", nullable = false)
+    @AttributeOverride(name = "numero", column = @Column(name = "documento_numero", nullable = false))
+    @AttributeOverride(name = "tipo", column = @Column(name = "documento_tipo", nullable = false))
     private DocumentoIdentidad documentoIdentidad; 
+
+    @Column(name = "image")
     private String image;
     
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
 
     @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "telefono", nullable = true))
     private Telefono telefono; 
 
     @Column(name = "telefono_verified", nullable = false)
@@ -38,6 +54,10 @@ public class User {
 
     @Embedded
     private Address address;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id", nullable = true)
+    private Store store;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status_user", nullable = false)
@@ -48,14 +68,17 @@ public class User {
     private GlobalRole globalRole;
 
     @Embedded
-    @Column(name = "audit_metadata", nullable = false)
     private AuditMetadata auditMetadata;
 
-    // Constructor vacío protegido requerido obligatoriamente por Hibernate (JPA)
+    /**
+     * Constructor vacío requerido obligatoriamente por JPA / Hibernate.
+     */
     protected User() {
     }
 
-    // Constructor privado para forzar el uso del Factory Method
+    /**
+     * Constructor privado para forzar la instanciación a través del método de fábrica estático.
+     */
     private User(
             String nombres,
             String apellidos,
@@ -65,6 +88,7 @@ public class User {
             Telefono telefono,
             GlobalRole globalRole,
             Address address,
+            Store store,
             String createdBy
     ) {
         this.nombres = nombres;
@@ -75,13 +99,28 @@ public class User {
         this.telefono = telefono;
         this.globalRole = globalRole;
         this.address = address;
+        this.store = store;
         this.emailVerified = false;
         this.telefonoVerified = false;
         this.statusUser = StatusUser.ACTIVO;
         this.auditMetadata = AuditMetadata.create(createdBy);
     }
 
-    // Factory Method limpio para la creación de usuarios
+    /**
+     * Método de fábrica estático para la creación limpia de usuarios.
+     *
+     * @param nombres Nombres del usuario.
+     * @param apellidos Apellidos del usuario.
+     * @param email Correo electrónico principal.
+     * @param documentoIdentidad Documento de identidad oficial.
+     * @param image URL o ruta de la foto de perfil.
+     * @param telefono Teléfono de contacto.
+     * @param globalRole Rol asignado (SUPER_ADMIN, ADMIN_TIENDA, VENDEDOR, ENCARGADO_ALMACEN_TINTORERIA).
+     * @param address Dirección del usuario.
+     * @param store Tienda a la que pertenece el usuario (null si es SUPER_ADMIN).
+     * @param createdBy Usuario o sistema creador.
+     * @return Nueva instancia de {@link User}.
+     */
     public static User create(
             String nombres,
             String apellidos,
@@ -91,38 +130,54 @@ public class User {
             Telefono telefono,
             GlobalRole globalRole,
             Address address,
+            Store store,
             String createdBy
     ) {
-        return new User(nombres, apellidos, email, documentoIdentidad, image, telefono, globalRole, address, createdBy);
+        return new User(nombres, apellidos, email, documentoIdentidad, image, telefono, globalRole, address, store, createdBy);
     }
 
-    // Métodos de negocio 
+    /**
+     * Marca el correo electrónico del usuario como verificado.
+     *
+     * @param updatedBy Usuario responsable de la actualización.
+     */
     public void verifyEmail(String updatedBy) {
         this.emailVerified = true;
         this.auditMetadata = this.auditMetadata.update(updatedBy);
     }
 
+    /**
+     * Activa el estado del usuario.
+     *
+     * @param updatedBy Usuario responsable de la actualización.
+     */
     public void markAsActive(String updatedBy) {
         this.statusUser = StatusUser.ACTIVO;
         this.auditMetadata = this.auditMetadata.update(updatedBy);
     }
 
+    /**
+     * Inactiva el estado del usuario.
+     *
+     * @param updatedBy Usuario responsable de la actualización.
+     */
     public void markAsInactive(String updatedBy) {
         this.statusUser = StatusUser.INACTIVO;
         this.auditMetadata = this.auditMetadata.update(updatedBy);
     }
 
-    // Getters para exponer el estado de forma segura (Inmutabilidad externa)
+    // Getters para exponer el estado de forma segura
     public Long getId() { return id; }
     public String getNombres() { return nombres; }
-    public String getContent() { return apellidos; }
+    public String getApellidos() { return apellidos; }
     public Email getEmail() { return email; }
-    public DocumentoIdentidad getDni() { return documentoIdentidad; }
+    public DocumentoIdentidad getDocumentoIdentidad() { return documentoIdentidad; }
     public String getImage() { return image; }
     public boolean isEmailVerified() { return emailVerified; }
     public Telefono getTelefono() { return telefono; }
     public boolean isTelefonoVerified() { return telefonoVerified; }
     public Address getAddress() { return address; }
+    public Store getStore() { return store; }
     public StatusUser getStatusUser() { return statusUser; }
     public GlobalRole getGlobalRole() { return globalRole; }
     public AuditMetadata getAuditMetadata() { return auditMetadata; }
