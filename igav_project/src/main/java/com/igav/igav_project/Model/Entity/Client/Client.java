@@ -105,4 +105,43 @@ public class Client {
             auditMetadata
         );
     }
+  public Long getId() {
+    return id;
+  }
+  public String getTenantId() {
+    return TenantId;
+  }
+  public DocumentoIdentidad getDocumentoIdentidad() {
+    return DocumentoIdentidad;
+  }
+  public NombrePersona getNombrePersona() {
+    return NombrePersona;
+  }
+  public String getEmail() {
+    return Email;
+  }
+  public String getTelefono() {
+    return Telefono;
+  }
+  public ClientStatus getClientStatus() {
+    return ClientStatus;
+  }
+  public String getGenero() {
+    return Genero;
+  }
+  public Date getFechaNacimiento() {
+    return FechaNacimiento;
+  }
+  public Address getAddress() {
+    return Address;
+  }
+  public String getInternalNotes() {
+    return InternalNotes;
+  }
+  public String getMetadata() {
+    return Metadata;
+  }
+  public AuditMetadata getAuditMetadata() {
+    return AuditMetadata;
+  }
 }
