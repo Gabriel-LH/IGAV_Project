@@ -13,53 +13,60 @@ public class ModuleFeature {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column (name = "tenant_id", nullable = false, length = 100)
-    private String TenantId;
-    @Column (name = "module_id", nullable = false, length = 100)
-    private String ModuleId;
+
+    @JoinColumn (name = "module_id", nullable = false)
+    @ManyToOne (fetch = FetchType.LAZY)
+    private Module Module;
     @Column (name = "plan_feature_key", nullable = false, length = 100)
     @Embedded 
     private PlanFeatureKey PlanFeatureKey;
     @Column (name = "audit_metadata", nullable = true, columnDefinition = "TEXT")
     @Embedded
     private AuditMetadata AuditMetadata;
-    public ModuleFeature(Long id, String tenantId, String moduleId,
+    
+      public ModuleFeature() {
+    }
+
+    public ModuleFeature(Long id, Module module,
             PlanFeatureKey planFeatureKey,
             AuditMetadata auditMetadata) {
         this.id = id;
-        TenantId = tenantId;
-        ModuleId = moduleId;
+        Module = module;
         PlanFeatureKey = planFeatureKey;
         AuditMetadata = auditMetadata;
     }
+
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
-    public String getTenantId() {
-        return TenantId;
+
+    public Module getModule() {
+        return Module;
     }
-    public void setTenantId(String tenantId) {
-        TenantId = tenantId;
+
+    public void setModule(Module module) {
+        Module = module;
     }
-    public String getModuleId() {
-        return ModuleId;
-    }
-    public void setModuleId(String moduleId) {
-        ModuleId = moduleId;
-    }
+
     public PlanFeatureKey getPlanFeatureKey() {
         return PlanFeatureKey;
     }
+
     public void setPlanFeatureKey(PlanFeatureKey planFeatureKey) {
         PlanFeatureKey = planFeatureKey;
     }
+
     public AuditMetadata getAuditMetadata() {
         return AuditMetadata;
     }
+
     public void setAuditMetadata(AuditMetadata auditMetadata) {
         AuditMetadata = auditMetadata;
     }
+
+    
 }

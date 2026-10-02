@@ -20,6 +20,7 @@ public class PlanFeature {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn (name = "plan_id", nullable = false)
     private Plan Plan;
+    
     @CollectionTable (name = "plan_feature_keys", joinColumns = @JoinColumn(name = "plan_feature_id"))
     @ElementCollection
     @Embedded

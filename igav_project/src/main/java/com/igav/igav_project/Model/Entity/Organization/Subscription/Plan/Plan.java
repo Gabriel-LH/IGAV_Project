@@ -1,7 +1,11 @@
 package com.igav.igav_project.Model.Entity.Organization.Subscription.Plan;
 
 import java.sql.Date;
+import java.util.List;
 
+import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanFeature.PlanFeature;
+import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanLimit.PlanLimit;
+import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlonModule.PlanModule;
 import com.igav.igav_project.Model.Shared.ValueObjects.Moneda;
 
 import jakarta.persistence.*;
@@ -32,7 +36,16 @@ public class Plan {
     public int SortOrder;
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
-    
+
+    @OneToMany (mappedBy = "Plan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlanModule> planModules;
+
+    @OneToMany (mappedBy = "Plan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlanLimit> planLimits;
+
+    @OneToMany (mappedBy = "Plan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlanFeature> planFeatures;
+
     public Plan() {
     }
 
