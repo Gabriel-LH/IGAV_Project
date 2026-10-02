@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Store as StoreIcon, Building2, MapPin, Phone, Shield, CheckCircle2, Plus, X } from 'lucide-react';
+import { Store as StoreIcon, Building2, MapPin, Phone, Shield, CheckCircle2, Plus, X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Store } from '../lib/types';
 import { toast } from 'sonner';
@@ -28,7 +28,7 @@ export const StoreManagement: React.FC<StoreManagementProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nombre || !direccion) {
-      toast.error('Ingrese el nombre y dirección de la nueva sede');
+      toast.error('Ingrese el nombre y dirección de la nueva boutique.');
       return;
     }
 
@@ -38,94 +38,110 @@ export const StoreManagement: React.FC<StoreManagementProps> = ({
       codigoTenant: tenantCode,
       nombre,
       direccion,
-      telefono: telefono || '+51 900 000 000',
+      telefono: telefono || '+51 1 420 0000',
       ciudad,
       esSedePrincipal: false
     });
 
     setIsModalOpen(false);
-    toast.success(`Sede "${nombre}" configurada con Tenant ID: ${tenantCode} (Aislamiento Multi-tenant RF-01).`);
+    toast.success(`Boutique "${nombre}" habilitada con código: ${tenantCode}.`);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-extrabold text-[var(--text-primary)] flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-            Maestro de Sedes & Aislamiento Multi-Tenant (RF-01)
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[var(--border-subtle)]">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-gold)]" />
+            <span className="text-[10px] font-mono tracking-[0.24em] uppercase text-[var(--accent-gold)] font-medium">
+              Red de Salones & Sedes
+            </span>
+          </div>
+          <h2 className="font-serif-editorial text-2xl sm:text-3xl text-[var(--text-primary)] font-light">
+            Ateliers, Boutiques & Sedes Privadas
           </h2>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Control de inventarios y contratos aislados por sucursal / tenant id en la arquitectura SaaS.
+          <p className="text-xs text-[var(--text-secondary)] font-sans-editorial max-w-xl">
+            Aislamiento estricto de inventarios y contratos por boutique ceremonial. Gestión de sedes en San Isidro, Miraflores y futuras aperturas.
           </p>
         </div>
 
         <motion.button
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2 self-start sm:self-auto"
+          className="px-5 py-2.5 bg-[var(--accent-gold)] hover:bg-[var(--accent-gold-hover)] text-[#1A1817] font-sans-editorial text-xs font-semibold tracking-wider uppercase transition-all shadow-sm flex items-center gap-2 self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          Registrar Nueva Sede / Tenant
+          <span>Inaugurar Nueva Boutique</span>
         </motion.button>
       </div>
 
-      {/* Store Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* Stores Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {stores.map((store) => {
           const isActive = store.id === activeStoreId;
+
           return (
             <div
               key={store.id}
-              className={`glass-card rounded-2xl p-5 border space-y-4 transition-all ${
+              className={`bg-[var(--surface-card)] border p-6 transition-all duration-300 space-y-4 flex flex-col justify-between ${
                 isActive
-                  ? 'border-amber-500/50 bg-amber-500/10 shadow-lg shadow-amber-500/10'
-                  : 'border-[var(--glass-border)] hover:border-[var(--border-color)]'
+                  ? 'border-[var(--accent-gold)] shadow-md'
+                  : 'border-[var(--border-subtle)] hover:border-[var(--accent-gold)]/60'
               }`}
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[var(--glass-bg)] border border-[var(--glass-border)] text-amber-800 dark:text-amber-300">
-                    {store.codigoTenant}
-                  </span>
-                  <h3 className="font-bold text-[var(--text-primary)] text-base mt-2">{store.nombre}</h3>
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{store.ciudad}</span>
-                </div>
-                {store.esSedePrincipal && (
-                  <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/40">
-                    Sede Central
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-2 text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--border-color)]">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0" />
-                  <span>{store.direccion}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
-                  <span>{store.telefono}</span>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-[var(--border-color)]">
-                {isActive ? (
-                  <div className="w-full py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-800 dark:text-amber-300 font-bold text-xs flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-                    Sede Activa Seleccionada
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono tracking-wider uppercase text-[var(--text-tertiary)]">
+                        {store.codigoTenant}
+                      </span>
+                      {store.esSedePrincipal && (
+                        <span className="text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 border border-[var(--accent-gold)]/40 bg-[var(--accent-gold-light)] text-[var(--accent-gold)]">
+                          Sede Insignia
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="font-serif-editorial text-xl text-[var(--text-primary)] font-medium mt-1">
+                      {store.nombre}
+                    </h3>
                   </div>
-                ) : (
-                  <motion.button whileTap={{ scale: 0.96 }} onClick={() => {
-                      onSelectActiveStore(store.id);
-                      toast.success(`Cambiado a contexto de sede: ${store.nombre}`);
-                    }}
-                    className="w-full py-2 rounded-xl bg-[var(--glass-bg)] hover:bg-[var(--card-bg-hover)] border border-[var(--glass-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-semibold text-xs transition-colors"
-                  >
-                    Cambiar a esta Sede →
-                  </motion.button>
-                )}
+
+                  {isActive ? (
+                    <span className="text-[10px] font-mono tracking-wider uppercase px-2.5 py-1 bg-[var(--accent-sage-light)] text-[var(--accent-sage)] border border-[var(--accent-sage)]/40 flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Salón Activo</span>
+                    </span>
+                  ) : (
+                    <motion.button
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => {
+                        onSelectActiveStore(store.id);
+                        toast.info(`Cambiado a contexto de sede: ${store.nombre}`);
+                      }}
+                      className="text-xs font-mono tracking-wider uppercase px-3 py-1 border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-gold)] transition-colors"
+                    >
+                      Ingresar
+                    </motion.button>
+                  )}
+                </div>
+
+                <div className="space-y-1.5 pt-2 border-t border-[var(--border-subtle)] text-xs font-sans-editorial text-[var(--text-secondary)]">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-[var(--text-tertiary)] shrink-0" />
+                    <span>{store.direccion}, {store.ciudad}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5 text-[var(--text-tertiary)] shrink-0" />
+                    <span>{store.telefono}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] font-mono text-[var(--text-tertiary)]">
+                <span>Catálogo y contratos aislados</span>
+                <span>{store.ciudad}</span>
               </div>
             </div>
           );
@@ -135,84 +151,100 @@ export const StoreManagement: React.FC<StoreManagementProps> = ({
       {/* New Store Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="glass-panel border border-[var(--border-color)] rounded-2xl w-full max-w-md p-6 relative space-y-5"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="bg-[var(--surface-card)] border border-[var(--border-subtle)] w-full max-w-lg p-6 sm:p-8 space-y-6 shadow-2xl relative"
             >
-              <div className="flex items-center justify-between border-b border-[var(--glass-border)] pb-4">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-                  <h3 className="text-lg font-bold text-[var(--text-primary)]">Registrar Nueva Sede</h3>
+              <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
+                <div className="space-y-1">
+                  <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-[var(--accent-gold)]">
+                    Expansión de Red
+                  </span>
+                  <h3 className="font-serif-editorial text-xl text-[var(--text-primary)]">
+                    Inauguración de Nueva Boutique
+                  </h3>
                 </div>
-                <motion.button whileTap={{ scale: 0.96 }} onClick={() => setIsModalOpen(false)}
-                  className="p-1 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--card-bg-hover)]"
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-1 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   <X className="w-5 h-5" />
-                </motion.button>
+                </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-                <div>
-                  <label className="block font-semibold text-[var(--text-secondary)] mb-1">Nombre de la Sede *</label>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono tracking-wider uppercase text-[var(--text-secondary)]">
+                    Nombre de la Boutique
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="Ej. Sede La Molina"
+                    placeholder="Boutique Nupcial Chacarilla"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)]"
+                    className="w-full px-3 py-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                   />
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-[var(--text-secondary)] mb-1">Dirección Completa *</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-mono tracking-wider uppercase text-[var(--text-secondary)]">
+                    Dirección
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="Av. Raúl Ferrero 1200, La Molina"
+                    placeholder="Calle Monterrey 320, Surco"
                     value={direccion}
                     onChange={(e) => setDireccion(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)]"
+                    className="w-full px-3 py-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">Ciudad</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono tracking-wider uppercase text-[var(--text-secondary)]">
+                      Teléfono
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="+51 1 450 9900"
+                      value={telefono}
+                      onChange={(e) => setTelefono(e.target.value)}
+                      className="w-full px-3 py-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono tracking-wider uppercase text-[var(--text-secondary)]">
+                      Ciudad
+                    </label>
                     <input
                       type="text"
                       value={ciudad}
                       onChange={(e) => setCiudad(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">Teléfono Sede</label>
-                    <input
-                      type="text"
-                      placeholder="+51 987 654 321"
-                      value={telefono}
-                      onChange={(e) => setTelefono(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)]"
+                      className="w-full px-3 py-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                     />
                   </div>
                 </div>
 
-                <div className="pt-3 flex justify-end gap-3 border-t border-[var(--glass-border)]">
-                  <motion.button whileTap={{ scale: 0.96 }} type="button"
+                <div className="pt-4 border-t border-[var(--border-subtle)] flex items-center justify-end gap-3">
+                  <button
+                    type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--glass-bg)]"
+                    className="px-4 py-2 border border-[var(--border-subtle)] text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                   >
                     Cancelar
-                  </motion.button>
-                  <motion.button whileTap={{ scale: 0.96 }} type="submit"
-                    className="px-5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold shadow-lg shadow-amber-500/20"
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-[var(--accent-gold)] hover:bg-[var(--accent-gold-hover)] text-[#1A1817] text-xs font-sans-editorial font-semibold uppercase tracking-wider transition-colors"
                   >
-                    Crear Sede Multi-tenant
-                  </motion.button>
+                    Registrar Boutique
+                  </button>
                 </div>
               </form>
             </motion.div>

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
-import { Sidebar, TabType } from '@/components/Sidebar';
+import { Sidebar, TabType, roleAccessMap } from '@/components/Sidebar';
 import { DashboardOverview } from '@/components/DashboardOverview';
 import { GarmentCatalog } from '@/components/GarmentCatalog';
 import { CustomerManagement } from '@/components/CustomerManagement';
@@ -16,8 +16,12 @@ import { ReturnInspectionModal } from '@/components/ReturnInspectionModal';
 import { RentalCartDrawer } from '@/components/RentalCartDrawer';
 import { ContractPdfModal } from '@/components/ContractPdfModal';
 import { WhatsAppNotificationModal } from '@/components/WhatsAppNotificationModal';
-import { LoginModal, AuthSession } from '@/components/LoginModal';
-import { Garment, Customer, Order, Store, User, TailoringRecord, TailoringStatus, fetchGarmentsByStore, fetchCustomers, fetchStores, fetchUsers } from '@/lib/api';
+import { LoginScreen, AuthSession } from '@/components/LoginScreen';
+import { 
+  Garment, Customer, Order, Store, User, TailoringRecord, TailoringStatus, 
+  fetchGarmentsByStore, fetchCustomers, fetchStores, fetchUsers, fetchOrders,
+  createUserApi, toggleUserStatusApi, createCustomerApi, createStoreApi, createOrderApi 
+} from '@/lib/api';
 import { Toaster, toast } from 'sonner';
 import { useTheme } from 'next-themes';
 
@@ -272,29 +276,52 @@ export default function AppHome() {
 
   // Estados para las nuevas funcionalidades: JWT, PDF y WhatsApp (wsp-js)
   const [userSession, setUserSession] = useState<AuthSession | null>(null);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [selectedOrderForPdf, setSelectedOrderForPdf] = useState<Order | null>(null);
   const [selectedOrderForWhatsApp, setSelectedOrderForWhatsApp] = useState<Order | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('igav_user');
-      if (savedUser) {
+      const savedToken = localStorage.getItem('igav_token');
+      if (savedUser && savedToken) {
         try {
           setUserSession(JSON.parse(savedUser));
         } catch (e) {
           console.error('Error parseando sesión guardada', e);
+          localStorage.removeItem('igav_token');
+          localStorage.removeItem('igav_user');
         }
       }
+      setIsCheckingAuth(false);
     }
   }, []);
+
+  const handleLoginSuccess = (session: AuthSession) => {
+    setUserSession(session);
+    loadBackendData();
+    const roleKey = session.rol?.toUpperCase() || 'VENDEDOR';
+    const allowed = roleAccessMap[roleKey] || roleAccessMap.VENDEDOR;
+    if (!allowed.includes(activeTab)) {
+      setActiveTab(allowed[0]);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('igav_token');
     localStorage.removeItem('igav_user');
     setUserSession(null);
-    toast.info('Sesión cerrada correctamente');
+    toast.info('Sesión cerrada correctamente. Ingrese credenciales para continuar.');
   };
+
+  const currentRole = userSession?.rol?.toUpperCase() || 'VENDEDOR';
+  const allowedTabs: TabType[] = roleAccessMap[currentRole] || roleAccessMap.VENDEDOR;
+
+  useEffect(() => {
+    if (userSession && !allowedTabs.includes(activeTab)) {
+      setActiveTab(allowedTabs[0]);
+    }
+  }, [userSession, activeTab, allowedTabs]);
 
   const currentStore = stores.find((s) => s.id === activeStoreId) || stores[0];
 
@@ -309,13 +336,15 @@ export default function AppHome() {
       const cData = await fetchCustomers();
       const sData = await fetchStores();
       const uData = await fetchUsers();
+      const oData = await fetchOrders();
 
       if (Array.isArray(gData) && gData.length > 0) setGarments(gData);
       if (Array.isArray(cData) && cData.length > 0) setCustomers(cData);
       if (Array.isArray(sData) && sData.length > 0) setStores(sData);
       if (Array.isArray(uData) && uData.length > 0) setUsers(uData);
+      if (Array.isArray(oData) && oData.length > 0) setOrders(oData);
 
-      toast.success('Sincronizacion completa con Spring Boot API');
+      toast.success('Sincronización completa con MySQL & Spring Boot API');
     } catch (err) {
       console.log('Modo offline / datos locales cargados');
     } finally {
@@ -333,28 +362,22 @@ export default function AppHome() {
     setGarments((prev) => [created, ...prev]);
   };
 
-  const handleAddCustomer = (newC: Omit<Customer, 'id' | 'totalAlquileres' | 'calificacion' | 'fechaRegistro'>) => {
-    const created: Customer = {
-      ...newC,
-      id: Date.now(),
-      totalAlquileres: 0,
-      calificacion: 5.0,
-      fechaRegistro: new Date().toISOString().split('T')[0]
-    };
-    setCustomers((prev) => [created, ...prev]);
+  const handleAddCustomer = async (newC: Omit<Customer, 'id' | 'totalAlquileres' | 'calificacion' | 'fechaRegistro'>) => {
+    const saved = await createCustomerApi(newC);
+    setCustomers((prev) => [saved, ...prev]);
+    toast.success(`Cliente "${saved.nombreCompleto}" sincronizado en MySQL.`);
   };
 
-  const handleAddStore = (newS: Omit<Store, 'id'>) => {
-    const created: Store = { ...newS, id: Date.now() };
-    setStores((prev) => [...prev, created]);
+  const handleAddStore = async (newS: Omit<Store, 'id'>) => {
+    const saved = await createStoreApi(newS);
+    setStores((prev) => [...prev, saved]);
+    toast.success(`Sede "${saved.nombre}" sincronizada en MySQL.`);
   };
 
-  const handleAddUser = (newU: Omit<User, 'id'>) => {
-    const created: User = {
-      ...newU,
-      id: Date.now()
-    };
-    setUsers((prev) => [...prev, created]);
+  const handleAddUser = async (newU: Omit<User, 'id'>) => {
+    const saved = await createUserApi(newU);
+    setUsers((prev) => [saved, ...prev]);
+    toast.success(`Usuario "${saved.username}" sincronizado en MySQL.`);
   };
 
   const handleAddTailoringRecord = (newT: Omit<TailoringRecord, 'id'>) => {
@@ -368,32 +391,41 @@ export default function AppHome() {
     );
   };
 
-  const handleToggleUserStatus = (userId: number) => {
+  const handleToggleUserStatus = async (userId: number) => {
+    await toggleUserStatusApi(userId);
     setUsers((prev) =>
       prev.map((u) => (u.id === userId ? { ...u, activo: !u.activo } : u))
     );
+    toast.info('Estado de usuario actualizado en MySQL.');
   };
 
-  const handleAddOrder = (newOrder: Order) => {
-    setOrders((prev) => [newOrder, ...prev]);
-    const garmentIds = newOrder.items?.map(i => i.garmentId) || [];
-    if (garmentIds.length > 0) {
-      setGarments((prev) =>
-        prev.map((g) =>
-          garmentIds.includes(g.id)
-            ? { ...g, estado: 'ALQUILADO', usosAcumulados: g.usosAcumulados + 1 }
-            : g
-        )
-      );
-    }
-    if (newOrder.customerId) {
-      setCustomers((prev) =>
-        prev.map((c) =>
-          c.id === newOrder.customerId
-            ? { ...c, totalAlquileres: c.totalAlquileres + 1 }
-            : c
-        )
-      );
+  const handleAddOrder = async (newOrder: Order) => {
+    try {
+      const saved = await createOrderApi(newOrder);
+      setOrders((prev) => [saved, ...prev]);
+      const garmentIds = (saved.items || newOrder.items || []).map(i => i.garmentId);
+      if (garmentIds.length > 0) {
+        setGarments((prev) =>
+          prev.map((g) =>
+            garmentIds.includes(g.id)
+              ? { ...g, estado: 'ALQUILADO', usosAcumulados: g.usosAcumulados + 1 }
+              : g
+          )
+        );
+      }
+      if (saved.customerId || newOrder.customerId) {
+        const cId = saved.customerId || newOrder.customerId;
+        setCustomers((prev) =>
+          prev.map((c) =>
+            c.id === cId
+              ? { ...c, totalAlquileres: c.totalAlquileres + 1 }
+              : c
+          )
+        );
+      }
+      toast.success(`Reserva ${saved.codigoContrato} guardada exitosamente en MySQL.`);
+    } catch (err: any) {
+      toast.error(err.message || 'Error al persistir la orden en la base de datos.');
     }
   };
 
@@ -475,11 +507,14 @@ export default function AppHome() {
     setCart([]);
   };
 
-  const handleCheckoutComplete = (newOrder: Order, newCustomer?: Customer) => {
+  const handleCheckoutComplete = async (newOrder: Order, newCustomer?: Customer) => {
+    let orderToSave = newOrder;
     if (newCustomer) {
-      setCustomers(prev => [newCustomer, ...prev]);
+      const savedCust = await createCustomerApi(newCustomer);
+      setCustomers(prev => [savedCust, ...prev]);
+      orderToSave = { ...newOrder, customerId: savedCust.id };
     }
-    handleAddOrder(newOrder);
+    await handleAddOrder(orderToSave);
   };
 
   const openReturnForOrder = (orderId?: number) => {
@@ -498,6 +533,24 @@ export default function AppHome() {
 
   const laundryCount = garments.filter((g) => g.estado === 'EN_TINTORERIA').length;
 
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[#07090e] flex flex-col items-center justify-center text-amber-100">
+        <div className="w-12 h-12 border-2 border-amber-500/20 border-t-amber-400 rounded-full animate-spin mb-4" />
+        <p className="text-xs uppercase tracking-widest text-amber-200/60 font-serif">Verificando Credenciales I.G.A.V....</p>
+      </div>
+    );
+  }
+
+  if (!userSession) {
+    return (
+      <>
+        <Toaster position="bottom-right" theme="dark" richColors />
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] flex flex-col transition-colors duration-300">
       <Toaster position="bottom-right" theme="dark" richColors />
@@ -509,7 +562,6 @@ export default function AppHome() {
         cartCount={cart.length}
         onOpenCart={() => setIsCartOpen(true)}
         userSession={userSession}
-        onOpenLogin={() => setIsLoginModalOpen(true)}
         onLogout={handleLogout}
       />
 
@@ -522,10 +574,11 @@ export default function AppHome() {
           customerCount={customers.length}
           userCount={users.length}
           tailoringCount={tailoringRecords.filter(t => t.estado !== 'ENTALLADO_LISTO_ENTREGA').length}
+          userRole={currentRole}
         />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto min-w-0 w-full">
-          {activeTab === 'dashboard' && (
+          {activeTab === 'dashboard' && allowedTabs.includes('dashboard') && (
             <DashboardOverview
               garments={garments}
               orders={orders}
@@ -535,7 +588,7 @@ export default function AppHome() {
             />
           )}
 
-          {activeTab === 'garments' && (
+          {activeTab === 'garments' && allowedTabs.includes('garments') && (
             <GarmentCatalog
               garments={garments}
               onAddGarment={handleAddGarment}
@@ -548,7 +601,7 @@ export default function AppHome() {
             />
           )}
 
-          {activeTab === 'customers' && (
+          {activeTab === 'customers' && allowedTabs.includes('customers') && (
             <CustomerManagement
               customers={customers}
               onAddCustomer={handleAddCustomer}
@@ -559,7 +612,7 @@ export default function AppHome() {
             />
           )}
 
-          {activeTab === 'orders' && (
+          {activeTab === 'orders' && allowedTabs.includes('orders') && (
             <OrderManagement
               orders={orders}
               garments={garments}
@@ -572,7 +625,7 @@ export default function AppHome() {
             />
           )}
 
-          {activeTab === 'tailoring' && (
+          {activeTab === 'tailoring' && allowedTabs.includes('tailoring') && (
             <TailoringManagement
               records={tailoringRecords}
               orders={orders}
@@ -581,14 +634,14 @@ export default function AppHome() {
             />
           )}
 
-          {activeTab === 'laundry' && (
+          {activeTab === 'laundry' && allowedTabs.includes('laundry') && (
             <LaundryManagement
               laundryGarments={garments.filter((g) => g.estado === 'EN_TINTORERIA')}
               onReleaseGarment={handleReleaseGarment}
             />
           )}
 
-          {activeTab === 'alerts' && (
+          {activeTab === 'alerts' && allowedTabs.includes('alerts') && (
             <RotationAlertsView
               garments={garments}
               onResetWear={handleResetWear}
@@ -596,7 +649,7 @@ export default function AppHome() {
             />
           )}
 
-          {activeTab === 'stores' && (
+          {activeTab === 'stores' && allowedTabs.includes('stores') && (
             <StoreManagement
               stores={stores}
               activeStoreId={activeStoreId}
@@ -605,13 +658,33 @@ export default function AppHome() {
             />
           )}
 
-          {activeTab === 'users' && (
+          {activeTab === 'users' && allowedTabs.includes('users') && (
             <UserManagement
               users={users}
               stores={stores}
               onAddUser={handleAddUser}
               onToggleUserStatus={handleToggleUserStatus}
             />
+          )}
+
+          {!allowedTabs.includes(activeTab) && (
+            <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-red-500/20 bg-red-500/5 my-8">
+              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-400 mb-4">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m4-11a4 4 0 00-8 0v4h8V6z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-red-200">Acceso No Autorizado</h3>
+              <p className="text-sm text-neutral-400 max-w-md mt-1">
+                Tu perfil de usuario (<span className="text-amber-400 font-semibold">{currentRole}</span>) no tiene permisos asignados para visualizar este módulo.
+              </p>
+              <button
+                onClick={() => setActiveTab(allowedTabs[0])}
+                className="mt-5 px-5 py-2 rounded-xl bg-amber-500 text-black font-semibold text-xs tracking-wider uppercase hover:bg-amber-400 transition-colors"
+              >
+                Volver a mi Módulo Principal
+              </button>
+            </div>
           )}
         </main>
       </div>
@@ -634,7 +707,7 @@ export default function AppHome() {
         onReturnProcessed={handleReturnProcessed}
       />
 
-      {/* Modales de Valor Agregado: PDF de Contratos, Notificaciones WhatsApp y Login JWT */}
+      {/* Modales de Valor Agregado: PDF de Contratos y Notificaciones WhatsApp */}
       <ContractPdfModal
         isOpen={!!selectedOrderForPdf}
         onClose={() => setSelectedOrderForPdf(null)}
@@ -653,12 +726,6 @@ export default function AppHome() {
         order={selectedOrderForWhatsApp}
         customer={customers.find(c => c.id === selectedOrderForWhatsApp?.customerId)}
         storeName={stores.find(s => s.id === selectedOrderForWhatsApp?.storeId)?.nombre || currentStore.nombre}
-      />
-
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onLoginSuccess={(session) => setUserSession(session)}
       />
     </div>
   );

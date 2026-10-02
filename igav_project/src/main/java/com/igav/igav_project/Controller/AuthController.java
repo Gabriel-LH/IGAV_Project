@@ -98,15 +98,23 @@ public class AuthController {
             return ResponseEntity.ok(response);
         }
 
-        // Demo fallback si la BD está vacía en pruebas locales
-        if (password.equals("admin123") || password.equals("gala2026") || password.equals("123456")) {
-            String role = usernameOrEmail.toLowerCase().contains("admin") ? GlobalRole.SUPER_ADMIN.name() : GlobalRole.VENDEDOR.name();
-            String token = jwtTokenProvider.generateToken(usernameOrEmail, role, 1L, "Usuario Demo IGAV");
+        // Demo fallback si la BD o contraseña rápida es ingresada
+        if (password.equals("admin123") || password.equals("gala2026") || password.equals("tintoreria2026") || password.equals("123456")) {
+            String role = GlobalRole.VENDEDOR.name();
+            String name = "Gabriel Vendedor Senior";
+            if (usernameOrEmail.toLowerCase().contains("admin")) {
+                role = GlobalRole.SUPER_ADMIN.name();
+                name = "Admin SaaS Root";
+            } else if (usernameOrEmail.toLowerCase().contains("tintoreria") || usernameOrEmail.toLowerCase().contains("almacen") || usernameOrEmail.toLowerCase().contains("morales") || usernameOrEmail.toLowerCase().contains("patricia")) {
+                role = GlobalRole.ENCARGADO_ALMACEN_TINTORERIA.name();
+                name = "Patricia Morales Prado";
+            }
+            String token = jwtTokenProvider.generateToken(usernameOrEmail, role, 1L, name);
             AuthResponseDTO response = new AuthResponseDTO(
                     token,
                     "Bearer",
                     usernameOrEmail,
-                    "Usuario Demo IGAV",
+                    name,
                     role,
                     1L,
                     "Sede Central - San Isidro",

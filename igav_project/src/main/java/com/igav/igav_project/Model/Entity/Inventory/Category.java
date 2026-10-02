@@ -4,6 +4,8 @@ import com.igav.igav_project.Model.Entity.Store.Store;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entidad JPA que representa una Categoría de prendas dentro del catálogo de la tienda.
@@ -14,6 +16,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "categories")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Category {
 
     @Id
@@ -28,6 +31,7 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
+    @JsonIgnore
     private Store store;
 
     @Embedded

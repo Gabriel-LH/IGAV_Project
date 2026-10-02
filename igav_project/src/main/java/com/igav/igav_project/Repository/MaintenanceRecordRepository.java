@@ -4,7 +4,6 @@ import com.igav.igav_project.Model.Entity.Maintenance.MaintenanceRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.List;
  *
  * @author IGAV Development Team
  */
-@Repository
 public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRecord, Long> {
 
     /**
@@ -43,3 +41,4 @@ public interface MaintenanceRecordRepository extends JpaRepository<MaintenanceRe
             @Param("fechaDevolucion") LocalDateTime fechaDevolucion
     );
 }
+

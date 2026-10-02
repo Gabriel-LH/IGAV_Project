@@ -4,6 +4,7 @@ import com.igav.igav_project.Model.Entity.Store.Store;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 
 /**
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "garments")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Garment {
 
     @Id

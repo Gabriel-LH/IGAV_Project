@@ -2,7 +2,6 @@ package com.igav.igav_project.Repository;
 
 import com.igav.igav_project.Model.Entity.Order.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +11,6 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-@Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     /**
@@ -32,3 +30,4 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      */
     List<Customer> findByStoreId(Long storeId);
 }
+

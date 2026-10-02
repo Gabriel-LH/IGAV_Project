@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CalendarCheck, 
   Plus, 
@@ -16,7 +16,9 @@ import {
   FileText,
   Send,
   MessageSquare,
-  User
+  User,
+  Scissors,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Garment, Order, Customer } from '../lib/types';
@@ -54,8 +56,15 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
   const [selectedGarmentId, setSelectedGarmentId] = useState<number>(
     garments[0]?.id || 1
   );
-  const [fechaEntrega, setFechaEntrega] = useState('2026-10-05');
-  const [fechaDevolucion, setFechaDevolucion] = useState('2026-10-08');
+  const [fechaEntrega, setFechaEntrega] = useState('2026-10-16');
+  const [fechaDevolucion, setFechaDevolucion] = useState('2026-10-19');
+
+  // Bespoke Fitting / Sastrería Fina state
+  const [bustoCm, setBustoCm] = useState(88);
+  const [cinturaCm, setCinturaCm] = useState(68);
+  const [caderaCm, setCaderaCm] = useState(94);
+  const [alturaConTaconCm, setAlturaConTaconCm] = useState(172);
+  const [solicitarConserjeSastre, setSolicitarConserjeSastre] = useState(false);
 
   const selectedGarment = garments.find((g) => g.id === Number(selectedGarmentId)) || garments[0];
 
@@ -71,6 +80,21 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
       setClienteTelefono(telStr);
     }
   };
+
+  useEffect(() => {
+    if (customers && customers.length > 0) {
+      const match = customers.find((c) => c.id === selectedCustomerId) || customers[0];
+      if (match) {
+        handleCustomerChange(match.id);
+      }
+    }
+  }, [customers]);
+
+  useEffect(() => {
+    if (garments && garments.length > 0 && !garments.some((g) => g.id === Number(selectedGarmentId))) {
+      setSelectedGarmentId(garments[0].id);
+    }
+  }, [garments]);
 
   // RF-04 Date Collision Validation Check Logic
   const checkDateCollision = (): { isCollision: boolean; reason?: string } => {
@@ -94,7 +118,7 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
         if (startReq < orderEndWithLaundry && endReq > orderStart) {
           return {
             isCollision: true,
-            reason: `Conflicto de Fechas (RF-04 / RF-05): La prenda ya posee una reserva asignada (${order.codigoContrato}) o está bloqueada por tintorería hasta el ${new Date(orderEndWithLaundry).toLocaleDateString('es-ES')}.`
+            reason: `Conflicto de Fechas (RF-04): La pieza ya posee una reserva asignada (${order.codigoContrato}) o se encontrará en ciclo de vaporizado y regeneración artesanal hasta el ${new Date(orderEndWithLaundry).toLocaleDateString('es-ES')}.`
           };
         }
       }
@@ -111,314 +135,400 @@ export const OrderManagement: React.FC<OrderManagementProps> = ({
       toast.error(collisionResult.reason);
       return;
     }
-    if (!clienteNombre) {
-      toast.error('Ingrese el nombre del cliente');
-      return;
-    }
+    const targetCust = customers.find((c) => c.id === selectedCustomerId) || customers[0];
+    const finalNombre = clienteNombre || (targetCust ? (targetCust.nombreCompleto || `${targetCust.nombres || ''} ${targetCust.apellidos || ''}`.trim()) : 'Cliente Registrado');
+    const finalDoc = clienteDocumento || (targetCust?.numeroDocumento || '71029384');
+    const finalTel = clienteTelefono || (targetCust?.telefono || '+51 987 654 321');
+
+    const bespokeNote = `[Bespoke Fitting: Busto ${bustoCm}cm, Cintura ${cinturaCm}cm, Cadera ${caderaCm}cm, Altura/Tacón ${alturaConTaconCm}cm${solicitarConserjeSastre ? ' · Asistencia VIP de Sastre en Suite Solicitada' : ''}]`;
 
     const newOrder: Order = {
       id: Date.now(),
       codigoContrato: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-      customerId: selectedCustomerId,
-      clienteDocumento: clienteDocumento,
-      clienteNombreCompleto: clienteNombre,
-      clienteTelefono: clienteTelefono,
+      customerId: targetCust ? targetCust.id : selectedCustomerId,
+      clienteDocumento: finalDoc,
+      clienteNombreCompleto: finalNombre,
+      clienteTelefono: finalTel,
       storeId: 1,
-      tipo: 'ALQUILAR',
+      tipo: 'ALQUILER',
       fechaEntregaAcordada: `${fechaEntrega}T10:00:00`,
       fechaDevolucionAcordada: `${fechaDevolucion}T18:00:00`,
-      subtotal: selectedGarment ? selectedGarment.precioAlquiler : 250,
-      montoGarantiaTotal: selectedGarment ? selectedGarment.depositoGarantia : 100,
+      subtotal: selectedGarment ? Number(selectedGarment.precioAlquiler) : 280,
+      montoGarantiaTotal: selectedGarment ? Number(selectedGarment.depositoGarantia) : 100,
       descuentoGarantia: 0,
       montoPenalizacion: 0,
-      montoTotal: selectedGarment ? selectedGarment.precioAlquiler : 250,
-      garantiaDevueltaNeta: selectedGarment ? selectedGarment.depositoGarantia : 100,
-      estado: 'EN_ALQUILAR',
+      montoTotal: selectedGarment ? Number(selectedGarment.precioAlquiler) : 280,
+      garantiaDevueltaNeta: selectedGarment ? Number(selectedGarment.depositoGarantia) : 100,
+      estado: 'CONFIRMADA',
       items: selectedGarment ? [
         {
           garmentId: selectedGarment.id,
           garmentName: selectedGarment.nombre,
           garmentSku: selectedGarment.codigoUnico,
-          tipoItem: 'ALQUILAR',
-          precioAplicado: selectedGarment.precioAlquiler,
-          garantiaAplicada: selectedGarment.depositoGarantia
+          tipoItem: 'ALQUILER',
+          precioAplicado: Number(selectedGarment.precioAlquiler),
+          garantiaAplicada: Number(selectedGarment.depositoGarantia)
         }
       ] : []
     };
 
     onAddOrder(newOrder);
     setIsOpenNewModal(false);
-    toast.success(`Reserva ${newOrder.codigoContrato} creada exitosamente. Fechas validadas sin solapamiento.`);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-extrabold text-[var(--text-primary)] flex items-center gap-2">
-            <CalendarCheck className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-            Contratos de Alquiler y Reservas de Gala
+    <div className="space-y-8">
+      {/* Editorial Header */}
+      <div className="border-b border-[var(--border-subtle)] pb-6 pt-2 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-gold)]"></span>
+            <p className="text-[10px] uppercase tracking-[0.24em] font-mono text-[var(--accent-gold)]">
+              Protocolo de Custodia Temporal · Alta Costura
+            </p>
+          </div>
+          <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[var(--text-primary)] italic font-normal tracking-wide">
+            Contratos de Alquiler & Reservas de Gala
           </h2>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Validación de traslape de fechas en tiempo real (RF-04) y depósito en garantía (RF-06).
+          <p className="text-xs text-[var(--text-secondary)] font-light max-w-xl leading-relaxed">
+            Detección de solapamiento de fechas en tiempo real (RF-04), asignación de fianza patrimonial (RF-06) 
+            y especificación de medidas para la costura fina de atelier.
           </p>
         </div>
 
         <motion.button
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => setIsOpenNewModal(true)}
-          className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2 self-start sm:self-auto"
+          className="px-5 py-2.5 text-xs font-mono font-medium tracking-wider uppercase bg-[#1A1817] dark:bg-[#EDE9E1] text-[#F6F4EE] dark:text-[#1A1817] hover:opacity-90 transition-all flex items-center gap-2 shadow-sm self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4" />
-          Crear Nuevo Contrato / Reserva
+          <Plus className="w-3.5 h-3.5 text-[var(--accent-gold)]" />
+          <span>Formalizar Nueva Reserva</span>
         </motion.button>
       </div>
 
       {/* Orders List Table */}
-      <div className="glass-panel rounded-2xl border border-[var(--glass-border)] overflow-hidden">
-        <div className="p-4 border-b border-[var(--glass-border)] flex items-center justify-between">
-          <h3 className="font-bold text-[var(--text-primary)] text-sm">Registros de Alquiler Activos y Pasados</h3>
-          <span className="text-xs text-amber-700 dark:text-amber-400 font-mono font-bold">{orders.length} Contratos Registrados</span>
+      <div className="border border-[var(--border-subtle)] bg-[var(--surface-card)] overflow-hidden">
+        <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CalendarCheck className="w-4 h-4 text-[var(--accent-gold)]" />
+            <h3 className="font-serif-editorial text-lg italic text-[var(--text-primary)]">
+              Libro de Veladas & Contratos Registrados
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-[var(--text-secondary)] tracking-wider uppercase">
+            {orders.length} Contratos en Registro
+          </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-[var(--glass-bg)] border-b border-[var(--glass-border)] text-[var(--text-secondary)] uppercase font-semibold text-[10px] tracking-wider">
+              <tr className="border-b border-[var(--border-subtle)] bg-transparent text-[var(--text-secondary)] uppercase font-mono text-[9px] tracking-[0.18em]">
                 <th className="p-3.5">Código Contrato</th>
-                <th className="p-3.5">Cliente & DNI</th>
-                <th className="p-3.5">Prenda Alquilada</th>
-                <th className="p-3.5">Fecha Entrega</th>
-                <th className="p-3.5">Fecha Devolución</th>
-                <th className="p-3.5 text-right">Alquiler (S/)</th>
-                <th className="p-3.5 text-right">Garantía (S/)</th>
+                <th className="p-3.5">Titular de la Custodia</th>
+                <th className="p-3.5">Creación de Archivo</th>
+                <th className="p-3.5">Entrega Acordada</th>
+                <th className="p-3.5">Devolución / Velada</th>
+                <th className="p-3.5 text-right">Custodia (S/)</th>
+                <th className="p-3.5 text-right">Fianza Retorno</th>
                 <th className="p-3.5 text-center">Estado</th>
                 <th className="p-3.5 text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
-              {orders.map((order) => {
-                const item = order.items?.[0];
-                return (
-                  <tr key={order.id} className="hover:bg-[var(--glass-bg)] transition-colors">
-                    <td className="p-3.5 font-mono font-bold text-amber-800 dark:text-amber-300">{order.codigoContrato}</td>
-                    <td className="p-3.5 font-medium text-[var(--text-primary)]">
-                      <div>{order.clienteNombreCompleto}</div>
-                      {order.clienteDocumento && (
-                        <div className="text-[10px] text-[var(--text-secondary)] font-mono">Doc: {order.clienteDocumento}</div>
-                      )}
-                    </td>
-                    <td className="p-3.5 text-[var(--text-secondary)] max-w-xs truncate">{item?.garmentName || 'Prenda de Gala'}</td>
-                    <td className="p-3.5 text-[var(--text-secondary)]">
-                      {new Date(order.fechaEntregaAcordada).toLocaleDateString('es-ES')}
-                    </td>
-                    <td className="p-3.5 text-[var(--text-secondary)]">
-                      {new Date(order.fechaDevolucionAcordada).toLocaleDateString('es-ES')}
-                    </td>
-                    <td className="p-3.5 text-right font-bold text-amber-700 dark:text-amber-400">S/ {order.subtotal.toFixed(2)}</td>
-                    <td className="p-3.5 text-right font-bold text-emerald-700 dark:text-emerald-400">S/ {order.montoGarantiaTotal.toFixed(2)}</td>
-                    <td className="p-3.5 text-center">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                        order.estado === 'EN_ALQUILAR' ? 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/30' :
-                        order.estado === 'DEVUELTO_PENDIENTE_TINTORERIA' ? 'bg-purple-500/10 text-purple-800 dark:text-purple-300 border-purple-500/30' :
-                        'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/30'
-                      }`}>
-                        {order.estado === 'EN_ALQUILAR' ? 'EN USO' : order.estado}
-                      </span>
-                    </td>
-                    <td className="p-3.5 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <button
-                          onClick={() => onDownloadPdf?.(order)}
-                          className="p-1.5 bg-stone-800/60 hover:bg-amber-500/20 text-stone-300 hover:text-amber-400 border border-stone-700/50 rounded-lg transition-all"
-                          title="Descargar Contrato PDF & Recibo Garantía"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => onSendWhatsApp?.(order)}
-                          className="p-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg transition-all"
-                          title="Enviar Alerta WhatsApp (wsp-js)"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+            <tbody className="divide-y divide-[var(--border-subtle)] font-mono text-[11px]">
+              {orders.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="p-12 text-center text-[var(--text-secondary)] font-serif-editorial text-lg italic">
+                    No existen contratos de gala registrados en este momento.
+                  </td>
+                </tr>
+              ) : (
+                orders.map((order) => {
+                  const item = order.items?.[0];
+                  return (
+                    <tr key={order.id} className="hover:bg-[var(--surface-elevated)] transition-colors">
+                      <td className="p-3.5 font-bold text-[var(--accent-gold)] tracking-wider">
+                        {order.codigoContrato}
+                      </td>
+                      <td className="p-3.5 font-sans-editorial text-[var(--text-primary)] font-medium">
+                        <div>{order.clienteNombreCompleto}</div>
+                        {order.clienteDocumento && (
+                          <div className="text-[10px] text-[var(--text-tertiary)] font-mono">DNI: {order.clienteDocumento}</div>
+                        )}
+                      </td>
+                      <td className="p-3.5 text-[var(--text-secondary)] max-w-xs truncate font-serif-editorial text-sm italic">
+                        {item?.garmentName || 'Creación de Gala'}
+                      </td>
+                      <td className="p-3.5 text-[var(--text-secondary)]">
+                        {new Date(order.fechaEntregaAcordada).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="p-3.5 text-[var(--text-secondary)]">
+                        {new Date(order.fechaDevolucionAcordada).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td className="p-3.5 text-right font-serif-editorial text-sm italic font-medium text-[var(--text-primary)]">
+                        S/ {order.subtotal.toFixed(2)}
+                      </td>
+                      <td className="p-3.5 text-right text-[var(--accent-sage)]">
+                        S/ {order.montoGarantiaTotal.toFixed(2)}
+                      </td>
+                      <td className="p-3.5 text-center">
+                        <span className={`px-2 py-0.5 text-[9px] uppercase tracking-wider font-mono border ${
+                          order.estado === 'CONFIRMADA' ? 'bg-[var(--accent-gold-light)] text-[var(--accent-gold)] border-[var(--accent-gold)]/40' :
+                          order.estado === 'EN_ALQUILER' || order.estado === 'EN_ALQUILAR' ? 'bg-[#5C1E26]/20 text-[var(--accent-burgundy)] border-[var(--accent-burgundy)]/40' :
+                          order.estado === 'DEVUELTO_PENDIENTE_TINTORERIA' ? 'bg-[var(--accent-sage-light)] text-[var(--accent-sage)] border-[var(--accent-sage)]/40' :
+                          'bg-transparent text-[var(--text-secondary)] border-[var(--border-subtle)]'
+                        }`}>
+                          {order.estado === 'CONFIRMADA' ? 'Confirmada' : order.estado === 'EN_ALQUILAR' ? 'En Velada' : order.estado}
+                        </span>
+                      </td>
+                      <td className="p-3.5 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => onDownloadPdf?.(order)}
+                            className="p-1.5 border border-[var(--border-subtle)] hover:border-[var(--accent-gold)] text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-all"
+                            title="Descargar Contrato Notarial & Recibo de Custodia"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => onSendWhatsApp?.(order)}
+                            className="p-1.5 border border-[var(--border-subtle)] hover:border-[var(--accent-sage)] text-[var(--text-secondary)] hover:text-[var(--accent-sage)] transition-all"
+                            title="Enviar Notificación de Concierge por WhatsApp"
+                          >
+                            <Send className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* New Order / Collision Modal */}
+      {/* New Order Modal with Gala Calendar and Bespoke Sastrería */}
       <AnimatePresence>
         {isOpenNewModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="glass-panel border border-[var(--border-color)] rounded-2xl w-full max-w-xl p-6 relative max-h-[90vh] overflow-y-auto space-y-5"
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+              className="bg-[var(--surface-card)] border border-[var(--border-subtle)] w-full max-w-2xl p-6 relative max-h-[92vh] overflow-y-auto space-y-6 shadow-2xl"
             >
-              <div className="flex items-center justify-between border-b border-[var(--glass-border)] pb-4">
-                <div className="flex items-center gap-2">
-                  <CalendarCheck className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-                  <h3 className="text-lg font-bold text-[var(--text-primary)]">Nuevo Contrato de Alquiler</h3>
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.24em] font-mono text-[var(--accent-gold)]">
+                    Atelier I.G.A.V. · Protocolo Notarial
+                  </p>
+                  <h3 className="font-serif-editorial text-2xl italic text-[var(--text-primary)]">
+                    Formalizar Contrato de Alquiler de Gala
+                  </h3>
                 </div>
-                <motion.button whileTap={{ scale: 0.96 }} onClick={() => setIsOpenNewModal(false)}
-                  className="p-1 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--card-bg-hover)]"
+                <button
+                  onClick={() => setIsOpenNewModal(false)}
+                  className="p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 >
                   <X className="w-5 h-5" />
-                </motion.button>
+                </button>
               </div>
 
-              <form onSubmit={handleCreateOrder} className="space-y-4 text-xs">
+              <form onSubmit={handleCreateOrder} className="space-y-6 text-xs font-mono">
+                {/* Cliente Selector */}
                 <div>
-                  <label className="block font-semibold text-[var(--text-secondary)] mb-1">Seleccionar Cliente Registrado (Maestro) *</label>
+                  <label className="block text-[10px] uppercase tracking-[0.16em] text-[var(--text-secondary)] mb-1">
+                    Titular de la Custodia (Directorio Maestro) *
+                  </label>
                   <select
                     value={selectedCustomerId}
                     onChange={(e) => handleCustomerChange(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--card-bg)] border border-[var(--glass-border)] text-[var(--text-primary)] font-medium"
+                    className="w-full px-3 py-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-mono text-xs focus:outline-none focus:border-[var(--accent-gold)]"
                   >
                     {customers.map((c: any) => {
-                      const docTipoStr = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
-                        ? (c.documentoIdentidad.tipo || 'DNI')
-                        : (typeof c.tipoDocumento === 'string' ? c.tipoDocumento : 'DNI');
                       const docNumStr = typeof c.documentoIdentidad === 'object' && c.documentoIdentidad !== null
                         ? (c.documentoIdentidad.numero || '')
                         : (typeof c.numeroDocumento === 'string' ? c.numeroDocumento : '');
                       const nameStr = c.nombreCompleto || `${c.nombres || ''} ${c.apellidos || ''}`.trim() || 'Cliente';
-                      const catStr = typeof c.categoriaCliente === 'string' ? c.categoriaCliente : 'REGULAR';
-
                       return (
                         <option key={c.id} value={c.id}>
-                          {nameStr} ({docTipoStr}: {docNumStr}) - [{catStr}]
+                          {nameStr} (Doc: {docNumStr})
                         </option>
                       );
                     })}
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">Documento Identidad</label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={clienteDocumento}
-                      className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-secondary)] font-mono"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">Teléfono Cliente</label>
-                    <input
-                      type="text"
-                      readOnly
-                      value={clienteTelefono}
-                      className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-secondary)]"
-                    />
-                  </div>
-                </div>
-
+                {/* Prenda Selector */}
                 <div>
-                  <label className="block font-semibold text-[var(--text-secondary)] mb-1">Seleccionar Prenda de Gala *</label>
+                  <label className="block text-[10px] uppercase tracking-[0.16em] text-[var(--text-secondary)] mb-1">
+                    Pieza de Alta Costura Seleccionada *
+                  </label>
                   <select
                     value={selectedGarmentId}
                     onChange={(e) => setSelectedGarmentId(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--card-bg)] border border-[var(--glass-border)] text-[var(--text-primary)]"
+                    className="w-full px-3 py-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-mono text-xs focus:outline-none focus:border-[var(--accent-gold)]"
                   >
                     {garments.map((g) => (
                       <option key={g.id} value={g.id}>
-                        {g.codigoUnico} - {g.nombre} (Talla {g.talla}) - S/ {g.precioAlquiler}
+                        {g.codigoUnico} · {g.nombre} (Talla: {g.talla}) · S/ {g.precioAlquiler}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">Fecha de Entrega (Evento) *</label>
-                    <input
-                      type="date"
-                      required
-                      value={fechaEntrega}
-                      onChange={(e) => setFechaEntrega(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)]"
-                    />
+                {/* Gala Calendar Section */}
+                <div className="border border-[var(--border-subtle)] p-4 bg-[var(--surface-elevated)] space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-[var(--accent-gold)]" />
+                      <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[var(--text-primary)] font-medium">
+                        Agenda de Fechas Ceremoniales
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-[var(--accent-sage)]">
+                      Regeneración: 48h post-evento
+                    </span>
                   </div>
-                  <div>
-                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">Fecha de Devolución *</label>
-                    <input
-                      type="date"
-                      required
-                      value={fechaDevolucion}
-                      onChange={(e) => setFechaDevolucion(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-[var(--glass-bg)] border border-[var(--glass-border)] text-[var(--text-primary)]"
-                    />
-                  </div>
-                </div>
 
-                {/* Real-time Collision Check Indicator (RF-04 / RF-05) */}
-                <div className={`p-3.5 rounded-xl border flex items-start gap-3 ${
-                  collisionResult.isCollision 
-                    ? 'bg-rose-500/10 border-rose-500/30 text-rose-800 dark:text-rose-300' 
-                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300'
-                }`}>
-                  {collisionResult.isCollision ? (
-                    <AlertOctagon className="w-5 h-5 text-rose-700 dark:text-rose-400 shrink-0 mt-0.5" />
-                  ) : (
-                    <ShieldCheck className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-[0.14em] text-[var(--text-secondary)] mb-1">
+                        Entrega para Prueba & Entalle *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={fechaEntrega}
+                        onChange={(e) => setFechaEntrega(e.target.value)}
+                        className="w-full px-3 py-2 bg-transparent border border-[var(--border-subtle)] text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent-gold)]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-[0.14em] text-[var(--text-secondary)] mb-1">
+                        Devolución Tras la Velada *
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={fechaDevolucion}
+                        onChange={(e) => setFechaDevolucion(e.target.value)}
+                        className="w-full px-3 py-2 bg-transparent border border-[var(--border-subtle)] text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent-gold)]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Collision Notice */}
+                  {collisionResult.isCollision && (
+                    <div className="p-3 border border-[var(--accent-burgundy)] bg-[var(--accent-burgundy-light)] text-[var(--text-primary)] flex items-start gap-2 text-[11px] leading-relaxed">
+                      <AlertOctagon className="w-4 h-4 text-[var(--accent-burgundy)] shrink-0 mt-0.5" />
+                      <span>{collisionResult.reason}</span>
+                    </div>
                   )}
+                </div>
+
+                {/* Bespoke Fit / Sastrería Fina Section */}
+                <div className="border border-[var(--border-subtle)] p-4 bg-[var(--surface-elevated)] space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Scissors className="w-4 h-4 text-[var(--accent-gold)]" />
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[var(--text-primary)] font-medium">
+                      Ajustes de Taller · Medidas de Atelier (Bespoke)
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-[var(--text-secondary)] font-light leading-relaxed">
+                    Nuestra maestra costurera aplicará un hilván temporal invisible en el forro para adaptar la caída a su fisonomía sin alterar el corte original.
+                  </p>
+
+                  <div className="grid grid-cols-4 gap-2 pt-1 text-[11px]">
+                    <div>
+                      <label className="block text-[9px] uppercase tracking-wider text-[var(--text-secondary)] mb-0.5">Busto (cm)</label>
+                      <input
+                        type="number"
+                        value={bustoCm}
+                        onChange={(e) => setBustoCm(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 bg-transparent border border-[var(--border-subtle)] text-center font-mono focus:border-[var(--accent-gold)]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] uppercase tracking-wider text-[var(--text-secondary)] mb-0.5">Cintura (cm)</label>
+                      <input
+                        type="number"
+                        value={cinturaCm}
+                        onChange={(e) => setCinturaCm(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 bg-transparent border border-[var(--border-subtle)] text-center font-mono focus:border-[var(--accent-gold)]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] uppercase tracking-wider text-[var(--text-secondary)] mb-0.5">Cadera (cm)</label>
+                      <input
+                        type="number"
+                        value={caderaCm}
+                        onChange={(e) => setCaderaCm(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 bg-transparent border border-[var(--border-subtle)] text-center font-mono focus:border-[var(--accent-gold)]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] uppercase tracking-wider text-[var(--text-secondary)] mb-0.5">Alt.+Tacón (cm)</label>
+                      <input
+                        type="number"
+                        value={alturaConTaconCm}
+                        onChange={(e) => setAlturaConTaconCm(Number(e.target.value))}
+                        className="w-full px-2 py-1.5 bg-transparent border border-[var(--border-subtle)] text-center font-mono focus:border-[var(--accent-gold)]"
+                      />
+                    </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 pt-2 cursor-pointer text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+                    <input
+                      type="checkbox"
+                      checked={solicitarConserjeSastre}
+                      onChange={(e) => setSolicitarConserjeSastre(e.target.checked)}
+                      className="accent-[#C4A47C]"
+                    />
+                    <span>Deseo asistencia privada de sastre en suite 24 horas antes para el vaporizado final.</span>
+                  </label>
+                </div>
+
+                {/* Financial Breakdown */}
+                <div className="border-t border-[var(--border-subtle)] pt-3 flex items-center justify-between text-xs font-mono">
                   <div>
-                    <h4 className="font-bold text-xs text-[var(--text-primary)]">
-                      {collisionResult.isCollision ? 'Conflicto de Disponibilidad (RF-04)' : 'Fechas Validadas Exitosamente'}
-                    </h4>
-                    <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
-                      {collisionResult.isCollision 
-                        ? collisionResult.reason 
-                        : `Prenda libre de reservas y con margen automático de tintorería (${selectedGarment?.horasTintoreriaBloqueo || 24}h post-evento).`}
-                    </p>
+                    <span className="text-[10px] uppercase text-[var(--text-secondary)] block">Tasa de Custodia:</span>
+                    <span className="font-serif-editorial text-xl italic font-semibold text-[var(--accent-gold)]">
+                      S/ {selectedGarment ? Number(selectedGarment.precioAlquiler).toFixed(2) : '280.00'}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] uppercase text-[var(--text-secondary)] block">Fianza Retornable:</span>
+                    <span className="font-mono text-xs text-[var(--accent-sage)]">
+                      S/ {selectedGarment ? Number(selectedGarment.depositoGarantia).toFixed(2) : '100.00'}
+                    </span>
                   </div>
                 </div>
 
-                {/* Price Breakdown */}
-                {selectedGarment && (
-                  <div className="p-3.5 rounded-xl bg-[var(--glass-bg)] border border-[var(--glass-border)] space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Precio Alquiler:</span>
-                      <span className="font-bold text-amber-700 dark:text-amber-400">S/ {selectedGarment.precioAlquiler.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[var(--text-secondary)]">Depósito Garantía (Reembolsable):</span>
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400">S/ {selectedGarment.depositoGarantia.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t border-[var(--glass-border)] text-sm font-extrabold">
-                      <span className="text-[var(--text-primary)]">Total a Cobrar Inicial:</span>
-                      <span className="text-[var(--text-primary)]">S/ {(selectedGarment.precioAlquiler + selectedGarment.depositoGarantia).toFixed(2)}</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-3 flex justify-end gap-3 border-t border-[var(--glass-border)]">
-                  <motion.button whileTap={{ scale: 0.96 }} type="button"
+                {/* Submit Actions */}
+                <div className="flex justify-end gap-3 pt-2 border-t border-[var(--border-subtle)]">
+                  <button
+                    type="button"
                     onClick={() => setIsOpenNewModal(false)}
-                    className="px-4 py-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--glass-bg)]"
+                    className="px-4 py-2 border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-xs font-mono"
                   >
-                    Cancelar
-                  </motion.button>
-                  <motion.button whileTap={{ scale: 0.96 }} type="submit"
+                    Cerrar
+                  </button>
+                  <button
+                    type="submit"
                     disabled={collisionResult.isCollision}
-                    className={`px-5 py-2 rounded-lg font-bold transition-all ${
-                      collisionResult.isCollision 
-                        ? 'bg-gray-700 text-[var(--text-secondary)] cursor-not-allowed'
-                        : 'bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20'
+                    className={`px-5 py-2 text-xs font-mono font-medium tracking-wider uppercase transition-all ${
+                      collisionResult.isCollision
+                        ? 'bg-[var(--surface-elevated)] text-[var(--text-tertiary)] border border-[var(--border-subtle)] cursor-not-allowed'
+                        : 'bg-[var(--accent-gold)] text-[#151413] hover:bg-[#B39167]'
                     }`}
                   >
-                    Confirmar Contrato
-                  </motion.button>
+                    Confirmar Custodia en MySQL
+                  </button>
                 </div>
               </form>
             </motion.div>

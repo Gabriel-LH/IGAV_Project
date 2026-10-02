@@ -132,4 +132,14 @@ public class GarmentService {
     public List<Garment> getGarmentsExceedingRotation(Long storeId) {
         return garmentRepository.findGarmentsExceedingMaxUses(storeId);
     }
+
+    /**
+     * Lista todas las prendas registradas en la plataforma de todas las sedes.
+     *
+     * @return Lista completa de prendas.
+     */
+    @Transactional(readOnly = true)
+    public List<Garment> getAllGarments() {
+        return garmentRepository.findAll();
+    }
 }

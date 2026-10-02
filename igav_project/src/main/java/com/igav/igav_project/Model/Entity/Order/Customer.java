@@ -8,6 +8,7 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Entidad JPA que representa a un Cliente final que realiza alquileres o compras en la tienda.
@@ -17,6 +18,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "customers")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Customer {
 
     @Id

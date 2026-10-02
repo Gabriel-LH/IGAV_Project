@@ -1,0 +1,80 @@
+2026/10/01-21:55:49.302 cfb4 Reusing MANIFEST D:\Users\jony_\Documents\Gits\IGAV_Project\wsp_service\.wsp_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/10/01-21:55:49.307 cfb4 Recovering log #21
+2026/10/01-21:55:49.319 cfb4 Reusing old log D:\Users\jony_\Documents\Gits\IGAV_Project\wsp_service\.wsp_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000021.log 
+2026/10/01-21:55:49.319 cfb4 Delete type=2 #20
+2026/10/01-21:55:49.530 14ad0 Level-0 table #26: started
+2026/10/01-21:55:49.545 14ad0 Level-0 table #26: 173500 bytes OK
+2026/10/01-21:55:49.547 14ad0 Delete type=0 #21
+2026/10/01-21:55:49.548 cfb4 Manual compaction at level-0 from '\x00\x11\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x12\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/01-21:55:49.558 14ad0 Level-0 table #28: started
+2026/10/01-21:55:49.565 14ad0 Level-0 table #28: 1204 bytes OK
+2026/10/01-21:55:49.567 14ad0 Delete type=0 #25
+2026/10/01-21:55:49.567 cfb4 Manual compaction at level-0 from '\x00\x10\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x11\x00\x00\x00' @ 0 : 0; will stop at '\x00\x16\x00\x00\x05' @ 40234 : 1
+2026/10/01-21:55:49.568 cfb4 Compacting 1@0 + 1@1 files
+2026/10/01-21:55:49.581 cfb4 Generated table #29@0: 4229 keys, 82375 bytes
+2026/10/01-21:55:49.581 cfb4 Compacted 1@0 + 1@1 files => 82375 bytes
+2026/10/01-21:55:49.581 cfb4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/10/01-21:55:49.582 cfb4 Delete type=2 #28
+2026/10/01-21:55:49.583 cfb4 Manual compaction at level-0 from '\x00\x16\x00\x00\x05' @ 40234 : 1 .. '\x00\x11\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/01-21:55:49.588 cfb4 Level-0 table #31: started
+2026/10/01-21:55:49.594 cfb4 Level-0 table #31: 5649 bytes OK
+2026/10/01-21:55:49.595 cfb4 Delete type=2 #26
+2026/10/01-21:55:49.595 cfb4 Delete type=0 #27
+2026/10/01-21:55:49.596 cfb4 Manual compaction at level-0 from '\x00\x12\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x13\x00\x00\x00' @ 0 : 0; will stop at '\x00\x16\x00\x00\xc8\x11\x00w\x00o\x00r\x00k\x00e\x00r\x00_\x00w\x00a\x00m\x00_\x00e\x00v\x00e\x00n\x00t\x00s' @ 40561 : 1
+2026/10/01-21:55:49.596 cfb4 Compacting 1@0 + 1@1 files
+2026/10/01-21:55:49.605 cfb4 Generated table #32@0: 4266 keys, 83570 bytes
+2026/10/01-21:55:49.605 cfb4 Compacted 1@0 + 1@1 files => 83570 bytes
+2026/10/01-21:55:49.606 cfb4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/10/01-21:55:49.607 cfb4 Delete type=2 #31
+2026/10/01-21:55:49.607 cfb4 Manual compaction at level-0 from '\x00\x16\x00\x00\xc8\x11\x00w\x00o\x00r\x00k\x00e\x00r\x00_\x00w\x00a\x00m\x00_\x00e\x00v\x00e\x00n\x00t\x00s' @ 40561 : 1 .. '\x00\x13\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/01-21:55:49.610 cfb4 Level-0 table #34: started
+2026/10/01-21:55:49.616 cfb4 Level-0 table #34: 408 bytes OK
+2026/10/01-21:55:49.618 cfb4 Delete type=2 #29
+2026/10/01-21:55:49.618 cfb4 Delete type=0 #30
+2026/10/01-21:55:49.619 cfb4 Manual compaction at level-0 from '\x00\x13\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x14\x00\x00\x00' @ 0 : 0; will stop at '\x00\x13\x00\x00\xc8\x06\x00s\x00t\x00a\x00t\x00u\x00s' @ 40698 : 0
+2026/10/01-21:55:49.619 cfb4 Compacting 1@0 + 1@1 files
+2026/10/01-21:55:49.627 cfb4 Generated table #35@0: 4250 keys, 83323 bytes
+2026/10/01-21:55:49.627 cfb4 Compacted 1@0 + 1@1 files => 83323 bytes
+2026/10/01-21:55:49.628 cfb4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/10/01-21:55:49.629 cfb4 Delete type=2 #34
+2026/10/01-21:55:49.629 cfb4 Manual compaction at level-0 from '\x00\x13\x00\x00\xc8\x06\x00s\x00t\x00a\x00t\x00u\x00s' @ 40698 : 0 .. '\x00\x14\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/01-21:55:49.634 cfb4 Level-0 table #37: started
+2026/10/01-21:55:49.640 cfb4 Level-0 table #37: 625 bytes OK
+2026/10/01-21:55:49.641 cfb4 Delete type=2 #32
+2026/10/01-21:55:49.641 cfb4 Delete type=0 #33
+2026/10/01-21:55:49.642 cfb4 Manual compaction at level-0 from '\x00\x14\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x15\x00\x00\x00' @ 0 : 0; will stop at '\x00\x14\x03\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 40738 : 0
+2026/10/01-21:55:49.642 cfb4 Compacting 1@0 + 1@1 files
+2026/10/01-21:55:49.652 cfb4 Generated table #38@0: 4214 keys, 82356 bytes
+2026/10/01-21:55:49.652 cfb4 Compacted 1@0 + 1@1 files => 82356 bytes
+2026/10/01-21:55:49.653 cfb4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/10/01-21:55:49.653 cfb4 Delete type=2 #37
+2026/10/01-21:55:49.654 cfb4 Manual compaction at level-0 from '\x00\x14\x03\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 40738 : 0 .. '\x00\x15\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/01-21:55:49.657 cfb4 Level-0 table #40: started
+2026/10/01-21:55:49.664 cfb4 Level-0 table #40: 500 bytes OK
+2026/10/01-21:55:49.665 cfb4 Delete type=2 #35
+2026/10/01-21:55:49.665 cfb4 Delete type=0 #36
+2026/10/01-21:55:49.666 cfb4 Manual compaction at level-0 from '\x00\x15\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x16\x00\x00\x00' @ 0 : 0; will stop at '\x00\x15\x00\x00\xc8\x0d\x00l\x00o\x00c\x00a\x00l\x00_\x00s\x00t\x00o\x00r\x00a\x00g\x00e' @ 40763 : 0
+2026/10/01-21:55:49.666 cfb4 Compacting 1@0 + 1@1 files
+2026/10/01-21:55:49.675 cfb4 Generated table #41@0: 4193 keys, 82066 bytes
+2026/10/01-21:55:49.675 cfb4 Compacted 1@0 + 1@1 files => 82066 bytes
+2026/10/01-21:55:49.676 cfb4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/10/01-21:55:49.677 cfb4 Delete type=2 #40
+2026/10/01-21:55:49.678 cfb4 Manual compaction at level-0 from '\x00\x15\x00\x00\xc8\x0d\x00l\x00o\x00c\x00a\x00l\x00_\x00s\x00t\x00o\x00r\x00a\x00g\x00e' @ 40763 : 0 .. '\x00\x16\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/01-21:55:49.683 cfb4 Level-0 table #43: started
+2026/10/01-21:55:49.687 cfb4 Level-0 table #43: 18105 bytes OK
+2026/10/01-21:55:49.688 cfb4 Delete type=2 #38
+2026/10/01-21:55:49.688 cfb4 Delete type=0 #39
+2026/10/01-21:55:49.690 cfb4 Manual compaction at level-0 from '\x00\x0f\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at '\x00\x16\x04\x01\x01\x0e\x00w\x00h\x00a\x00t\x00s\x00a\x00p\x00p\x00-\x00m\x00u\x00t\x00e\x00x' @ 40765 : 1
+2026/10/01-21:55:49.690 cfb4 Compacting 1@0 + 1@1 files
+2026/10/01-21:55:49.768 cfb4 Generated table #44@0: 4358 keys, 49154 bytes
+2026/10/01-21:55:49.768 cfb4 Compacted 1@0 + 1@1 files => 49154 bytes
+2026/10/01-21:55:49.769 cfb4 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/10/01-21:55:49.770 cfb4 Delete type=2 #43
+2026/10/01-21:55:49.771 cfb4 Manual compaction at level-0 from '\x00\x16\x04\x01\x01\x0e\x00w\x00h\x00a\x00t\x00s\x00a\x00p\x00p\x00-\x00m\x00u\x00t\x00e\x00x' @ 40765 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/10/01-21:55:49.771 cfb4 Manual compaction at level-1 from '\x00\x0f\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at '\x00\x16\x04\x01\x01\x0e\x00w\x00h\x00a\x00t\x00s\x00a\x00p\x00p\x00-\x00m\x00u\x00t\x00e\x00x' @ 40765 : 1
+2026/10/01-21:55:49.771 cfb4 Compacting 1@1 + 1@2 files
+2026/10/01-21:55:49.778 cfb4 Generated table #45@1: 335 keys, 4834 bytes
+2026/10/01-21:55:49.778 cfb4 Compacted 1@1 + 1@2 files => 4834 bytes
+2026/10/01-21:55:49.778 cfb4 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/10/01-21:55:49.779 cfb4 Delete type=2 #44
+2026/10/01-21:55:49.780 cfb4 Manual compaction at level-1 from '\x00\x16\x04\x01\x01\x0e\x00w\x00h\x00a\x00t\x00s\x00a\x00p\x00p\x00-\x00m\x00u\x00t\x00e\x00x' @ 40765 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at (end)

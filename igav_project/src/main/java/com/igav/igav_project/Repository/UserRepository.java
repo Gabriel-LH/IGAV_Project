@@ -2,7 +2,6 @@ package com.igav.igav_project.Repository;
 
 import com.igav.igav_project.Model.Entity.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +11,6 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
@@ -31,3 +29,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     List<User> findByStoreId(Long storeId);
 }
+

@@ -3,7 +3,6 @@ package com.igav.igav_project.Repository;
 import com.igav.igav_project.Model.Entity.Store.Store;
 import com.igav.igav_project.Model.Entity.Store.StoreStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,6 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-@Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
     /**
@@ -32,3 +30,4 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
      */
     List<Store> findByStatus(StoreStatus status);
 }
+

@@ -481,3 +481,201 @@ export async function processReturn(request: ReturnOrderRequest): Promise<any> {
     message: 'Devolución procesada correctamente con retención de garantía y bloqueo automático de 24h-48h en tintorería.'
   };
 }
+
+export async function createUserApi(user: Omit<User, 'id'>): Promise<User> {
+  try {
+    const res = await fetch(`${API_BASE}/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: user.username,
+        nombres: user.nombreCompleto.split(' ')[0] || user.nombreCompleto,
+        apellidos: user.nombreCompleto.split(' ').slice(1).join(' ') || 'Staff',
+        email: user.email,
+        rol: user.rol,
+        storeId: user.storeId,
+        telefono: '+51999888777',
+        tipoDocumento: 'DNI',
+        numeroDocumento: `${Math.floor(10000000 + Math.random() * 90000000)}`
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return normalizeUser(data);
+    }
+  } catch (e) {
+    console.warn('Error registrando usuario en BD', e);
+  }
+  return { ...user, id: Date.now() };
+}
+
+export async function toggleUserStatusApi(userId: number): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/users/${userId}/toggle-status`, {
+      method: 'PATCH'
+    });
+    return res.ok;
+  } catch (e) {
+    console.warn('Error actualizando estado de usuario en BD', e);
+    return false;
+  }
+}
+
+export async function createCustomerApi(cust: Omit<Customer, 'id' | 'totalAlquileres' | 'calificacion' | 'fechaRegistro'>): Promise<Customer> {
+  try {
+    const cleanTel = (cust.telefono || '+51999888777').replace(/[\s\-()]/g, '');
+    const res = await fetch(`${API_BASE}/customers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombres: cust.nombres || cust.nombreCompleto.split(' ')[0] || cust.nombreCompleto,
+        apellidos: cust.apellidos || cust.nombreCompleto.split(' ').slice(1).join(' ') || 'Cliente',
+        tipoDocumento: cust.tipoDocumento || 'DNI',
+        numeroDocumento: cust.numeroDocumento,
+        email: cust.email,
+        telefono: cleanTel.match(/^\+?\d{9,12}$/) ? cleanTel : '+51999888777',
+        direccion: cust.direccion,
+        storeId: 1
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return normalizeCustomer(data);
+    }
+  } catch (e) {
+    console.warn('Error registrando cliente en BD', e);
+  }
+  return {
+    ...cust,
+    id: Date.now(),
+    totalAlquileres: 0,
+    calificacion: 5.0,
+    fechaRegistro: new Date().toISOString().split('T')[0]
+  };
+}
+
+export async function createStoreApi(store: Omit<Store, 'id'>): Promise<Store> {
+  try {
+    const res = await fetch(`${API_BASE}/stores`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombreComercial: store.nombre,
+        razonSocial: `${store.nombre} S.A.C.`,
+        ruc: `2060${Math.floor(1000000 + Math.random() * 9000000)}`,
+        email: `contacto@${store.codigoTenant.toLowerCase()}.pe`,
+        telefono: store.telefono,
+        direccion: store.direccion,
+        ciudad: store.ciudad
+      })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return normalizeStore(data);
+    }
+  } catch (e) {
+    console.warn('Error registrando sede en BD', e);
+  }
+  return { ...store, id: Date.now() };
+}
+
+export async function fetchOrders(): Promise<Order[]> {
+  try {
+    const res = await fetch(`${API_BASE}/orders`);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        if (data.length === 0) return [];
+        return data.map((o: any) => ({
+          id: o.id,
+          codigoContrato: o.codigoContrato,
+          customerId: o.customerId,
+          clienteDocumento: o.clienteDocumento || '71029384',
+          clienteNombreCompleto: o.clienteNombreCompleto || o.clienteNombre || 'Cliente Registrado',
+          clienteTelefono: o.clienteTelefono || '+51 987 654 321',
+          storeId: o.storeId || 1,
+          tipo: (o.tipo === 'ALQUILER' ? 'ALQUILAR' : o.tipo) || 'ALQUILAR',
+          fechaEntregaAcordada: typeof o.fechaEntregaAcordada === 'string' ? o.fechaEntregaAcordada.split('T')[0] : '2026-09-28',
+          fechaDevolucionAcordada: typeof o.fechaDevolucionAcordada === 'string' ? o.fechaDevolucionAcordada.split('T')[0] : '2026-10-01',
+          subtotal: Number(o.subtotal || 0),
+          montoGarantiaTotal: Number(o.montoGarantiaTotal || 0),
+          descuentoGarantia: Number(o.descuentoGarantia || 0),
+          montoPenalizacion: Number(o.montoPenalizacion || 0),
+          montoTotal: Number(o.montoTotal || 0),
+          garantiaDevueltaNeta: Number(o.garantiaDevueltaNeta || 0),
+          estado: (o.estado === 'EN_ALQUILER' ? 'EN_ALQUILAR' : o.estado) || 'CONFIRMADA',
+          metodoPago: 'TARJETA_CREDITO_DEBITO',
+          items: Array.isArray(o.items) && o.items.length > 0
+            ? o.items.map((i: any) => ({
+                garmentId: i.garmentId,
+                garmentName: i.garmentName || 'Prenda de Gala',
+                garmentSku: i.garmentSku || 'SKU-GAL',
+                tipoItem: i.tipoItem || 'ALQUILAR',
+                precioAplicado: Number(i.precioAplicado || 0),
+                garantiaAplicada: Number(i.garantiaAplicada || 0)
+              }))
+            : []
+        }));
+      }
+    }
+  } catch (e) {
+    console.warn('API error en orders', e);
+  }
+  return mockOrders;
+}
+
+export async function createOrderApi(order: Order): Promise<Order> {
+  const fEntrega = order.fechaEntregaAcordada.includes('T')
+    ? order.fechaEntregaAcordada
+    : `${order.fechaEntregaAcordada}T10:00:00`;
+  const fDevolucion = order.fechaDevolucionAcordada.includes('T')
+    ? order.fechaDevolucionAcordada
+    : `${order.fechaDevolucionAcordada}T18:00:00`;
+
+  const res = await fetch(`${API_BASE}/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      storeId: order.storeId || 1,
+      customerId: order.customerId || 1,
+      tipo: 'ALQUILER',
+      fechaEntregaAcordada: fEntrega,
+      fechaDevolucionAcordada: fDevolucion,
+      observaciones: `Contrato de Alquiler de Gala ${order.codigoContrato}`,
+      items: (order.items || []).map(i => ({
+        garmentId: i.garmentId,
+        tipoItem: i.tipoItem === 'VENTA' ? 'VENTA' : 'ALQUILER',
+        precioAplicado: i.precioAplicado,
+        garantiaAplicada: i.garantiaAplicada
+      })),
+      createdBy: 'SYSTEM'
+    })
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    return {
+      ...order,
+      id: data.id || order.id,
+      codigoContrato: data.codigoContrato || order.codigoContrato,
+      clienteNombreCompleto: data.clienteNombreCompleto || order.clienteNombreCompleto,
+      subtotal: Number(data.subtotal || order.subtotal),
+      montoGarantiaTotal: Number(data.montoGarantiaTotal || order.montoGarantiaTotal),
+      montoTotal: Number(data.montoTotal || order.montoTotal),
+      items: Array.isArray(data.items) && data.items.length > 0
+        ? data.items.map((i: any) => ({
+            garmentId: i.garmentId,
+            garmentName: i.garmentName || 'Prenda de Gala',
+            garmentSku: i.garmentSku || 'SKU-GAL',
+            tipoItem: i.tipoItem || 'ALQUILAR',
+            precioAplicado: Number(i.precioAplicado || 0),
+            garantiaAplicada: Number(i.garantiaAplicada || 0)
+          }))
+        : order.items
+    };
+  } else {
+    const errData = await res.json().catch(() => null);
+    const msg = errData?.message || `Error del servidor HTTP ${res.status} al registrar orden`;
+    throw new Error(msg);
+  }
+}

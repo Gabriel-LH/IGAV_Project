@@ -17,6 +17,7 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 import com.igav.igav_project.Model.Shared.ValueObjects.TipoDocumento;
 import com.igav.igav_project.Repository.*;
+import com.igav.igav_project.Domain.Abstractions.DomainEventPublisher;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,6 +57,10 @@ class OrderServiceTest {
     private MaintenanceRecordRepository maintenanceRecordRepository;
     @Mock
     private ReturnIncidentRepository returnIncidentRepository;
+    @Mock
+    private GarmentStatusHistoryRepository garmentStatusHistoryRepository;
+    @Mock
+    private DomainEventPublisher eventPublisher;
 
     @InjectMocks
     private OrderService orderService;

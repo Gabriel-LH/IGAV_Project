@@ -4,14 +4,15 @@ import React from 'react';
 import { 
   Shirt, 
   CalendarCheck, 
-  DollarSign, 
   Clock, 
   AlertTriangle, 
   PlusCircle, 
   RotateCcw, 
-  ArrowUpRight, 
-  CheckCircle2,
-  Sparkles
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  Feather,
+  Coins
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Garment, Order } from '../lib/types';
@@ -31,7 +32,6 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   onOpenNewOrder,
   onOpenReturnModal
 }) => {
-  // Calculations
   const totalGarments = garments.length;
   const activeRentals = garments.filter(g => g.estado === 'ALQUILADO').length;
   const inLaundry = garments.filter(g => g.estado === 'EN_TINTORERIA').length;
@@ -41,230 +41,335 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
     .reduce((acc, curr) => acc + (curr.montoGarantiaTotal || 0), 0);
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner / Welcome */}
-      <div className="relative overflow-hidden rounded-2xl glass-panel border border-amber-500/20 p-6 bg-gradient-to-r from-amber-500/10 via-purple-500/5 to-transparent">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 z-10 relative">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-              <h2 className="text-2xl font-extrabold text-[var(--text-primary)]">Panel de Control de Alquileres & Gala</h2>
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Editorial Welcome Header */}
+      <section className="relative overflow-hidden bg-[var(--surface-elevated)] border border-[var(--border-subtle)] p-6 sm:p-8 transition-colors duration-300">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[var(--accent-gold)]/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-gold)]" />
+              <span className="text-[10px] font-mono tracking-[0.24em] uppercase text-[var(--accent-gold)] font-medium">
+                Cuaderno de Dirección & Salón Principal
+              </span>
             </div>
-            <p className="text-sm text-[var(--text-secondary)] max-w-xl">
-              Monitoreo de prendas exclusivas en tiempo real, control de reservas sin traslape de fechas y liquidación automática de depósitos en garantía.
+            
+            <h1 className="font-serif-editorial text-2xl sm:text-3xl lg:text-4xl text-[var(--text-primary)] font-light tracking-tight">
+              Maison I.G.A.V. <span className="italic font-serif-editorial text-[var(--accent-gold)]">Haute Couture</span>
+            </h1>
+            
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-sans-editorial max-w-2xl leading-relaxed">
+              Curaduría y supervisión del archivo textil, veladas ceremoniales programadas sin solapamiento de fechas y custodia preventiva de piezas de gala.
             </p>
           </div>
+
+          {/* Luxury Action Triggers */}
           <div className="flex flex-wrap items-center gap-3">
             <motion.button
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.98 }}
               onClick={onOpenNewOrder}
-              className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2"
+              className="px-5 py-2.5 bg-[var(--accent-gold)] hover:bg-[var(--accent-gold-hover)] text-[#1A1817] font-sans-editorial text-xs font-semibold tracking-wider uppercase transition-all duration-200 shadow-sm flex items-center gap-2"
             >
               <PlusCircle className="w-4 h-4" />
-              Nueva Reserva / Alquiler
+              <span>Nueva Reserva de Gala</span>
             </motion.button>
 
             <motion.button
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => onOpenReturnModal()}
-              className="px-4 py-2.5 rounded-xl bg-purple-600/80 hover:bg-purple-500 text-[var(--text-primary)] font-medium text-sm border border-purple-500/30 transition-all flex items-center gap-2"
+              className="px-5 py-2.5 bg-transparent hover:bg-[var(--surface-card)] text-[var(--text-primary)] border border-[var(--border-subtle)] font-sans-editorial text-xs font-medium tracking-wider uppercase transition-all duration-200 flex items-center gap-2"
             >
-              <RotateCcw className="w-4 h-4" />
-              Recepción & Devolución
+              <RotateCcw className="w-4 h-4 text-[var(--accent-gold)]" />
+              <span>Recepción & Fianza</span>
             </motion.button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Haute Couture Metrics Bar */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Garments */}
-        <div className="glass-card rounded-xl p-5 border border-[var(--glass-border)] relative overflow-hidden">
+        <div className="bg-[var(--surface-card)] border border-[var(--border-subtle)] p-5 relative overflow-hidden transition-all duration-300 hover:border-[var(--accent-gold)] group">
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Catálogo Total</p>
-              <h3 className="text-3xl font-extrabold text-[var(--text-primary)] mt-1">{totalGarments}</h3>
-              <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-2 flex items-center gap-1">
-                <ArrowUpRight className="w-3.5 h-3.5" />
-                <span>Prendas registradas</span>
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--text-tertiary)] block">
+                Archivo de Vestuario
+              </span>
+              <h3 className="font-serif-editorial text-3xl text-[var(--text-primary)] font-light">
+                {totalGarments}
+              </h3>
+              <p className="text-[11px] text-[var(--text-secondary)] font-sans-editorial flex items-center gap-1.5 pt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-sage)] inline-block" />
+                <span>Piezas registradas y curadas</span>
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
-              <Shirt className="w-6 h-6" />
+            <div className="w-10 h-10 border border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--accent-gold)] group-hover:border-[var(--accent-gold)] transition-colors">
+              <Shirt className="w-4 h-4 stroke-[1.5]" />
             </div>
           </div>
         </div>
 
         {/* Active Rentals */}
-        <div className="glass-card rounded-xl p-5 border border-[var(--glass-border)] relative overflow-hidden">
+        <div className="bg-[var(--surface-card)] border border-[var(--border-subtle)] p-5 relative overflow-hidden transition-all duration-300 hover:border-[var(--accent-gold)] group">
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Alquileres Activos</p>
-              <h3 className="text-3xl font-extrabold text-[var(--text-primary)] mt-1">{activeRentals}</h3>
-              <p className="text-xs text-amber-700 dark:text-amber-400 mt-2 flex items-center gap-1">
-                <span>En poder de clientes</span>
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--text-tertiary)] block">
+                Piezas en Velada Activa
+              </span>
+              <h3 className="font-serif-editorial text-3xl text-[var(--accent-gold)] font-light">
+                {activeRentals}
+              </h3>
+              <p className="text-[11px] text-[var(--text-secondary)] font-sans-editorial flex items-center gap-1.5 pt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-gold)] inline-block" />
+                <span>En custodia de huéspedes</span>
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-700 dark:text-amber-400">
-              <CalendarCheck className="w-6 h-6" />
+            <div className="w-10 h-10 border border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--accent-gold)] group-hover:border-[var(--accent-gold)] transition-colors">
+              <CalendarCheck className="w-4 h-4 stroke-[1.5]" />
             </div>
           </div>
         </div>
 
-        {/* Laundry / Maintenance */}
-        <div className="glass-card rounded-xl p-5 border border-[var(--glass-border)] relative overflow-hidden">
+        {/* Regenerating in Laundry */}
+        <div className="bg-[var(--surface-card)] border border-[var(--border-subtle)] p-5 relative overflow-hidden transition-all duration-300 hover:border-[var(--accent-burgundy)] group">
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">En Tintorería (24-48h)</p>
-              <h3 className="text-3xl font-extrabold text-[var(--text-primary)] mt-1">{inLaundry}</h3>
-              <p className="text-xs text-purple-700 dark:text-purple-400 mt-2 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Bloqueo preventivo de fecha</span>
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--text-tertiary)] block">
+                Regeneración de Fibras
+              </span>
+              <h3 className="font-serif-editorial text-3xl text-[var(--text-primary)] font-light">
+                {inLaundry}
+              </h3>
+              <p className="text-[11px] text-[var(--accent-burgundy)] font-sans-editorial flex items-center gap-1.5 pt-1">
+                <Clock className="w-3 h-3 stroke-[1.5]" />
+                <span>Bloqueo 24-48h de cuidado</span>
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-700 dark:text-purple-400">
-              <Clock className="w-6 h-6" />
+            <div className="w-10 h-10 border border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--accent-burgundy)] group-hover:border-[var(--accent-burgundy)] transition-colors">
+              <Feather className="w-4 h-4 stroke-[1.5]" />
             </div>
           </div>
         </div>
 
-        {/* Guarantee Held */}
-        <div className="glass-card rounded-xl p-5 border border-[var(--glass-border)] relative overflow-hidden">
+        {/* Custody Guarantee Held */}
+        <div className="bg-[var(--surface-card)] border border-[var(--border-subtle)] p-5 relative overflow-hidden transition-all duration-300 hover:border-[var(--accent-sage)] group">
           <div className="flex justify-between items-start">
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Garantías Retenidas</p>
-              <h3 className="text-3xl font-extrabold text-emerald-700 dark:text-emerald-400 mt-1">S/ {totalDepositHeld.toFixed(2)}</h3>
-              <p className="text-xs text-[var(--text-secondary)] mt-2">
-                En depósito por alquileres
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-[0.18em] uppercase text-[var(--text-tertiary)] block">
+                Fianzas en Custodia
+              </span>
+              <h3 className="font-serif-editorial text-3xl text-[var(--accent-sage)] font-light">
+                S/ {totalDepositHeld.toFixed(2)}
+              </h3>
+              <p className="text-[11px] text-[var(--text-secondary)] font-sans-editorial flex items-center gap-1.5 pt-1">
+                <ShieldCheck className="w-3 h-3 stroke-[1.5] text-[var(--accent-sage)]" />
+                <span>Depósitos en resguardo oficial</span>
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-700 dark:text-emerald-400">
-              <DollarSign className="w-6 h-6" />
+            <div className="w-10 h-10 border border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--accent-sage)] group-hover:border-[var(--accent-sage)] transition-colors">
+              <Coins className="w-4 h-4 stroke-[1.5]" />
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Alert Banner if rotation threshold reached */}
+      {/* Rotation & Inspection Alert if threshold met */}
       {rotationAlerts > 0 && (
-        <div className="glass-card rounded-xl border border-amber-500/40 p-4 bg-amber-500/10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-700 dark:text-amber-400">
-              <AlertTriangle className="w-5 h-5 animate-bounce" />
+        <section className="bg-[var(--surface-card)] border border-[var(--accent-burgundy)]/40 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="w-9 h-9 border border-[var(--accent-burgundy)]/30 bg-[var(--accent-burgundy-light)] flex items-center justify-center text-[var(--accent-burgundy)] shrink-0 mt-0.5">
+              <AlertTriangle className="w-4 h-4 stroke-[1.5]" />
             </div>
-            <div>
-              <h4 className="font-bold text-amber-200 text-sm">Alerta de Rotación e Inspección (RF-12)</h4>
-              <p className="text-xs text-amber-200/80">
-                Hay {rotationAlerts} prenda(s) que han alcanzado o superado el límite recomendado de usos. Requieren inspección de calidad o pase a mantenimiento.
+            <div className="space-y-1">
+              <h4 className="font-serif-editorial text-base text-[var(--text-primary)] font-medium">
+                Protocolo de Rotación e Inspección Textil (RF-12)
+              </h4>
+              <p className="text-xs text-[var(--text-secondary)] font-sans-editorial max-w-2xl leading-relaxed">
+                {rotationAlerts} pieza(s) han alcanzado el umbral recomendado de alquileres. Se sugiere evaluación minuciosa de forros, pedrería o planchado de alta temperatura antes de su siguiente asignación.
               </p>
             </div>
           </div>
-          <motion.button whileTap={{ scale: 0.96 }} onClick={() => onNavigate('alerts')}
-            className="px-3.5 py-1.5 rounded-lg bg-amber-500 text-black font-semibold text-xs hover:bg-amber-400 transition-colors"
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onNavigate('alerts')}
+            className="px-4 py-2 border border-[var(--accent-burgundy)] text-[var(--accent-burgundy)] hover:bg-[var(--accent-burgundy)] hover:text-white text-xs font-mono tracking-wider uppercase transition-colors shrink-0 self-start sm:self-auto"
           >
-            Ver Alertas
+            Examinar Piezas
           </motion.button>
-        </div>
+        </section>
       )}
 
-      {/* Main Grid Section: Active Garments Preview & Orders Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Garments Summary */}
-        <div className="lg:col-span-2 glass-panel rounded-2xl p-5 border border-[var(--glass-border)] space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Shirt className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-              Prendas Destacadas en Catálogo
-            </h3>
-            <motion.button whileTap={{ scale: 0.96 }} onClick={() => onNavigate('garments')}
-              className="text-xs text-amber-700 dark:text-amber-400 hover:underline font-medium"
+      {/* Main Dual Editorial Panel: Featured Garments & Recent Contracts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Featured Garments Curatorial View */}
+        <section className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-4 h-4 text-[var(--accent-gold)] stroke-[1.5]" />
+              <h3 className="font-serif-editorial text-lg text-[var(--text-primary)]">
+                Selección de Alta Costura en Salón
+              </h3>
+            </div>
+            
+            <button
+              onClick={() => onNavigate('garments')}
+              className="text-xs font-mono text-[var(--accent-gold)] hover:text-[var(--accent-gold-hover)] tracking-wider uppercase flex items-center gap-1.5 transition-colors"
             >
-              Ver todas ({garments.length}) →
-            </motion.button>
+              <span>Ver Archivo Completo ({garments.length})</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {garments.slice(0, 6).map((garment) => (
-              <div key={garment.id} className="glass-card rounded-xl p-3.5 border border-[var(--glass-border)] flex gap-3">
-                <img
-                  src={garment.imageUrl || 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=400'}
-                  alt={garment.nombre}
-                  className="w-16 h-20 object-cover rounded-lg bg-[var(--card-bg)] border border-[var(--glass-border)]"
-                />
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-[var(--text-secondary)] tracking-wider">
-                      {garment.categoryName || 'Gala'} • Talla {garment.talla}
-                    </span>
-                    <h4 className="text-xs font-bold text-[var(--text-primary)] line-clamp-1">{garment.nombre}</h4>
-                    <p className="text-[11px] text-amber-700 dark:text-amber-400 font-semibold mt-0.5">
-                      S/ {garment.precioAlquiler.toFixed(2)} / alquiler
-                    </p>
-                  </div>
+              <div 
+                key={garment.id}
+                className="bg-[var(--surface-card)] border border-[var(--border-subtle)] hover:border-[var(--accent-gold)] transition-all duration-300 flex flex-col group overflow-hidden"
+              >
+                {/* 3:4 Vertical Image Frame */}
+                <div className="relative aspect-[3/4] bg-[var(--surface-elevated)] overflow-hidden">
+                  <img
+                    src={garment.imageUrl || 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=600'}
+                    alt={garment.nombre}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
-                  <div className="flex items-center justify-between text-[10px]">
-                    <span className={`px-2 py-0.5 rounded-full font-semibold border ${
-                      garment.estado === 'DISPONIBLE' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30' :
-                      garment.estado === 'ALQUILADO' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30' :
-                      garment.estado === 'EN_TINTORERIA' ? 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/30' :
-                      'bg-gray-500/10 text-[var(--text-secondary)] border-gray-500/30'
+                  {/* Status Badge */}
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className={`text-[9px] font-mono tracking-widest uppercase px-2 py-0.5 border ${
+                      garment.estado === 'DISPONIBLE'
+                        ? 'bg-[var(--surface-card)]/90 text-[var(--accent-sage)] border-[var(--accent-sage)]/40'
+                        : garment.estado === 'ALQUILADO'
+                        ? 'bg-[var(--surface-card)]/90 text-[var(--accent-gold)] border-[var(--accent-gold)]/40'
+                        : 'bg-[var(--surface-card)]/90 text-[var(--accent-burgundy)] border-[var(--accent-burgundy)]/40'
                     }`}>
-                      {garment.estado}
+                      {garment.estado === 'DISPONIBLE' ? 'Disponible' : garment.estado === 'ALQUILADO' ? 'En Velada' : 'En Cuidado'}
                     </span>
-                    <span className="text-[var(--text-secondary)]">{garment.usosAcumulados}/{garment.maxUsosRecomendados} usos</span>
+                  </div>
+
+                  {/* Size & Code Overlay */}
+                  <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono text-white/90">
+                    <span>Talla {garment.talla}</span>
+                    <span>{garment.codigoUnico}</span>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2">
+                  <div>
+                    <span className="text-[9px] font-mono tracking-widest uppercase text-[var(--text-tertiary)] block">
+                      {garment.categoryName || 'Alta Costura'}
+                    </span>
+                    <h4 className="font-serif-editorial text-sm text-[var(--text-primary)] line-clamp-1 group-hover:text-[var(--accent-gold)] transition-colors">
+                      {garment.nombre}
+                    </h4>
+                  </div>
+
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
+                    <span className="font-serif-editorial text-sm font-medium text-[var(--text-primary)]">
+                      S/ {garment.precioAlquiler.toFixed(2)}
+                    </span>
+                    <span className="text-[10px] font-mono text-[var(--text-tertiary)]">
+                      {garment.usosAcumulados}/{garment.maxUsosRecomendados} usos
+                    </span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Orders Sidebar */}
-        <div className="glass-panel rounded-2xl p-5 border border-[var(--glass-border)] space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <CalendarCheck className="w-5 h-5 text-purple-700 dark:text-purple-400" />
-              Últimos Contratos
-            </h3>
-            <motion.button whileTap={{ scale: 0.96 }} onClick={() => onNavigate('orders')}
-              className="text-xs text-purple-700 dark:text-purple-400 hover:underline font-medium"
+        {/* Right Column: Upcoming Gala Contracts & Returns */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
+            <div className="flex items-center gap-2">
+              <CalendarCheck className="w-4 h-4 text-[var(--accent-gold)] stroke-[1.5]" />
+              <h3 className="font-serif-editorial text-lg text-[var(--text-primary)]">
+                Contratos de Salón
+              </h3>
+            </div>
+
+            <button
+              onClick={() => onNavigate('orders')}
+              className="text-xs font-mono text-[var(--accent-gold)] hover:text-[var(--accent-gold-hover)] tracking-wider uppercase flex items-center gap-1.5 transition-colors"
             >
-              Ver Todos →
-            </motion.button>
+              <span>Ver Todos</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           <div className="space-y-3">
-            {orders.map((order) => (
-              <div key={order.id} className="glass-card rounded-xl p-3.5 border border-[var(--glass-border)] space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-mono font-bold text-amber-800 dark:text-amber-300">{order.codigoContrato}</span>
-                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                    order.estado === 'EN_ALQUILAR' ? 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30' :
-                    order.estado === 'DEVUELTO_PENDIENTE_TINTORERIA' ? 'bg-purple-500/20 text-purple-800 dark:text-purple-300 border border-purple-500/30' :
-                    'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30'
-                  }`}>
-                    {order.estado === 'EN_ALQUILAR' ? 'EN USO' : order.estado}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[var(--text-primary)]">{order.clienteNombreCompleto}</p>
-                  <p className="text-[11px] text-[var(--text-secondary)]">
-                    Retorno: {new Date(order.fechaDevolucionAcordada).toLocaleDateString('es-ES')}
-                  </p>
-                </div>
-                <div className="flex justify-between items-center text-xs pt-1 border-t border-[var(--border-color)]">
-                  <span className="text-[var(--text-secondary)]">Depósito: S/ {order.montoGarantiaTotal}</span>
-                  <motion.button whileTap={{ scale: 0.96 }} onClick={() => onOpenReturnModal(order.id)}
-                    className="text-amber-700 dark:text-amber-400 hover:text-amber-800 dark:text-amber-300 text-[11px] font-semibold flex items-center gap-1"
-                  >
-                    Procesar Devolución →
-                  </motion.button>
-                </div>
+            {orders.length === 0 ? (
+              <div className="bg-[var(--surface-card)] border border-[var(--border-subtle)] p-8 text-center space-y-2">
+                <CalendarCheck className="w-6 h-6 text-[var(--text-tertiary)] mx-auto stroke-[1.5]" />
+                <p className="font-serif-editorial text-base text-[var(--text-primary)]">Sin contratos activos</p>
+                <p className="text-xs text-[var(--text-secondary)] font-sans-editorial">Inicie una nueva reserva de atelier para agendar una velada.</p>
               </div>
-            ))}
+            ) : (
+              orders.slice(0, 5).map((order) => (
+                <div 
+                  key={order.id}
+                  className="bg-[var(--surface-card)] border border-[var(--border-subtle)] p-4 space-y-2.5 hover:border-[var(--accent-gold)] transition-colors"
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-mono text-[11px] font-medium text-[var(--accent-gold)] tracking-wider">
+                      {order.codigoContrato}
+                    </span>
+                    <span className={`text-[9px] font-mono tracking-widest uppercase px-2 py-0.5 border ${
+                      order.estado === 'EN_ALQUILAR'
+                        ? 'bg-[var(--accent-gold-light)] text-[var(--accent-gold)] border-[var(--accent-gold)]/40'
+                        : order.estado === 'DEVUELTO_PENDIENTE_TINTORERIA'
+                        ? 'bg-[var(--accent-burgundy-light)] text-[var(--accent-burgundy)] border-[var(--accent-burgundy)]/40'
+                        : 'bg-[var(--accent-sage-light)] text-[var(--accent-sage)] border-[var(--accent-sage)]/40'
+                    }`}>
+                      {order.estado === 'EN_ALQUILAR' ? 'En Uso' : order.estado === 'DEVUELTO_PENDIENTE_TINTORERIA' ? 'En Lavandería' : 'Completado'}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h5 className="font-serif-editorial text-sm font-medium text-[var(--text-primary)]">
+                      {order.clienteNombreCompleto}
+                    </h5>
+                    <p className="text-[11px] font-sans-editorial text-[var(--text-secondary)] flex items-center gap-1.5 mt-0.5">
+                      <Clock className="w-3 h-3 text-[var(--text-tertiary)] stroke-[1.5]" />
+                      <span>Retorno acordado: {order.fechaDevolucionAcordada ? new Date(order.fechaDevolucionAcordada).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'Por definir'}</span>
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
+                    <span className="font-mono text-[11px] text-[var(--text-secondary)]">
+                      Fianza: S/ {order.montoGarantiaTotal?.toFixed(2)}
+                    </span>
+                    
+                    {order.estado === 'EN_ALQUILAR' && (
+                      <motion.button
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => onOpenReturnModal(order.id)}
+                        className="text-[11px] font-mono uppercase tracking-wider text-[var(--accent-gold)] hover:text-[var(--accent-gold-hover)] flex items-center gap-1"
+                      >
+                        <span>Recepción</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </motion.button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-        </div>
+        </section>
       </div>
+
+      {/* Curatorial Atelier Footer Quote */}
+      <footer className="pt-8 border-t border-[var(--border-subtle)] text-center space-y-1">
+        <p className="font-serif-editorial italic text-sm text-[var(--text-secondary)] max-w-lg mx-auto">
+          «La alta costura no es ostentación; es el respeto por la proporción, el silencio del buen tejido y la memoria de una velada inolvidable.»
+        </p>
+        <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--text-tertiary)]">
+          Maison I.G.A.V. — París & Lima
+        </p>
+      </footer>
     </div>
   );
 };

@@ -5,7 +5,6 @@ import com.igav.igav_project.Model.Entity.Inventory.GarmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +14,6 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-@Repository
 public interface GarmentRepository extends JpaRepository<Garment, Long> {
 
     /**
@@ -52,3 +50,4 @@ public interface GarmentRepository extends JpaRepository<Garment, Long> {
     @Query("SELECT g FROM Garment g WHERE g.store.id = :storeId AND g.usosAcumulados >= g.maxUsosRecomendados")
     List<Garment> findGarmentsExceedingMaxUses(@Param("storeId") Long storeId);
 }
+

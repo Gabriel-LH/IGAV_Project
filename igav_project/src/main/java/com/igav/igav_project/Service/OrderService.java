@@ -5,12 +5,17 @@ import com.igav.igav_project.Exception.DateCollisionException;
 import com.igav.igav_project.Exception.InvalidOrderStateException;
 import com.igav.igav_project.Exception.ResourceNotFoundException;
 import com.igav.igav_project.Model.Entity.Inventory.Garment;
+import com.igav.igav_project.Model.Entity.Inventory.GarmentStatus;
 import com.igav.igav_project.Model.Entity.Maintenance.MaintenanceRecord;
 import com.igav.igav_project.Model.Entity.Maintenance.MaintenanceType;
 import com.igav.igav_project.Model.Entity.Maintenance.ReturnIncident;
 import com.igav.igav_project.Model.Entity.Order.*;
 import com.igav.igav_project.Model.Entity.Store.Store;
 import com.igav.igav_project.Repository.*;
+import com.igav.igav_project.Domain.Abstractions.DomainEventPublisher;
+import com.igav.igav_project.Domain.Events.OrderCreatedEvent;
+import com.igav.igav_project.Domain.Events.OrderReturnedEvent;
+import com.igav.igav_project.Model.Entity.Inventory.GarmentStatusHistory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +26,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Servicio de negocio principal para la gestión de Contratos de Alquiler, Ventas y Liquidación de Garantías.
- * Cumple rigurosamente con los requerimientos RF-04, RF-05, RF-06, RF-08, RF-11, RF-12 y RF-13.
+ * Servicio de negocio principal para la gestión de Contratos de Alquiler,
+ * Ventas y Liquidación de Garantías.
+ * Cumple rigurosamente con los requerimientos RF-04, RF-05, RF-06, RF-08,
+ * RF-11, RF-12 y RF-13.
  *
  * @author IGAV Development Team
  */
@@ -35,6 +42,8 @@ public class OrderService {
     private final GarmentRepository garmentRepository;
     private final MaintenanceRecordRepository maintenanceRecordRepository;
     private final ReturnIncidentRepository returnIncidentRepository;
+    private final GarmentStatusHistoryRepository garmentStatusHistoryRepository;
+    private final DomainEventPublisher eventPublisher;
 
     public OrderService(
             OrderRepository orderRepository,
@@ -42,23 +51,29 @@ public class OrderService {
             CustomerRepository customerRepository,
             GarmentRepository garmentRepository,
             MaintenanceRecordRepository maintenanceRecordRepository,
-            ReturnIncidentRepository returnIncidentRepository
-    ) {
+            ReturnIncidentRepository returnIncidentRepository,
+            GarmentStatusHistoryRepository garmentStatusHistoryRepository,
+            DomainEventPublisher eventPublisher) {
         this.orderRepository = orderRepository;
         this.storeRepository = storeRepository;
         this.customerRepository = customerRepository;
         this.garmentRepository = garmentRepository;
         this.maintenanceRecordRepository = maintenanceRecordRepository;
         this.returnIncidentRepository = returnIncidentRepository;
+        this.garmentStatusHistoryRepository = garmentStatusHistoryRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
-     * Registra un nuevo contrato de alquiler u orden de venta con validación de colisión de fechas (RF-04, RF-06, RF-08).
+     * Registra un nuevo contrato de alquiler u orden de venta con validación de
+     * colisión de fechas (RF-04, RF-06, RF-08).
      *
      * @param request Datos de la orden a crear.
      * @return DTO de respuesta con los totales calculados.
-     * @throws ResourceNotFoundException si la tienda, cliente o alguna prenda no existen.
-     * @throws DateCollisionException si se detecta solapamiento de fechas en alquiler (RF-04).
+     * @throws ResourceNotFoundException si la tienda, cliente o alguna prenda no
+     *                                   existen.
+     * @throws DateCollisionException    si se detecta solapamiento de fechas en
+     *                                   alquiler (RF-04).
      */
     @Transactional
     public OrderResponseDTO createOrder(CreateOrderRequestDTO request) {
@@ -66,7 +81,8 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Tienda no encontrada con ID: " + request.storeId()));
 
         Customer customer = customerRepository.findById(request.customerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con ID: " + request.customerId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Cliente no encontrado con ID: " + request.customerId()));
 
         String codigoContrato = "ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
@@ -78,14 +94,14 @@ public class OrderService {
                 request.fechaEntregaAcordada(),
                 request.fechaDevolucionAcordada(),
                 request.observaciones(),
-                request.createdBy()
-        );
+                request.createdBy());
 
         List<OrderStatus> estadosIgnorados = Arrays.asList(OrderStatus.CANCELADA, OrderStatus.BORRADOR);
 
         for (OrderItemRequestDTO itemDto : request.items()) {
             Garment garment = garmentRepository.findById(itemDto.garmentId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Prenda no encontrada con ID: " + itemDto.garmentId()));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Prenda no encontrada con ID: " + itemDto.garmentId()));
 
             // Validación de colisión de fechas para ítems de alquiler (RF-04)
             if (itemDto.tipoItem() == OrderItemType.ALQUILER && request.fechaDevolucionAcordada() != null) {
@@ -93,26 +109,29 @@ public class OrderService {
                         garment.getId(),
                         request.fechaEntregaAcordada(),
                         request.fechaDevolucionAcordada(),
-                        estadosIgnorados
-                );
+                        estadosIgnorados);
 
                 if (hasCollision) {
-                    throw new DateCollisionException("La prenda '" + garment.getNombre() + "' (SKU: " + garment.getCodigoUnico() + ") ya cuenta con una reserva confirmada en las fechas seleccionadas.");
+                    throw new DateCollisionException(
+                            "La prenda '" + garment.getNombre() + "' (SKU: " + garment.getCodigoUnico()
+                                    + ") ya cuenta con una reserva confirmada en las fechas seleccionadas.");
                 }
 
                 boolean hasMaintenance = maintenanceRecordRepository.existsActiveMaintenanceInDateRange(
                         garment.getId(),
                         request.fechaEntregaAcordada(),
-                        request.fechaDevolucionAcordada()
-                );
+                        request.fechaDevolucionAcordada());
 
                 if (hasMaintenance) {
-                    throw new DateCollisionException("La prenda '" + garment.getNombre() + "' se encuentra bloqueada por ciclo de tintorería/mantenimiento en el periodo solicitado.");
+                    throw new DateCollisionException("La prenda '" + garment.getNombre()
+                            + "' se encuentra bloqueada por ciclo de tintorería/mantenimiento en el periodo solicitado.");
                 }
             }
 
-            BigDecimal precio = itemDto.precioAplicado() != null ? itemDto.precioAplicado() : garment.getPrecioAlquiler();
-            BigDecimal garantia = itemDto.garantiaAplicada() != null ? itemDto.garantiaAplicada() : garment.getDepositoGarantia();
+            BigDecimal precio = itemDto.precioAplicado() != null ? itemDto.precioAplicado()
+                    : garment.getPrecioAlquiler();
+            BigDecimal garantia = itemDto.garantiaAplicada() != null ? itemDto.garantiaAplicada()
+                    : garment.getDepositoGarantia();
 
             OrderItem item = OrderItem.create(order, garment, itemDto.tipoItem(), precio, garantia);
             order.addItem(item);
@@ -120,6 +139,8 @@ public class OrderService {
 
         order.confirmarOrden(request.createdBy());
         Order savedOrder = orderRepository.save(order);
+        eventPublisher.publish(new OrderCreatedEvent(savedOrder.getId(), savedOrder.getCodigoContrato(),
+                customer.getId(), store.getId()));
 
         return mapToResponseDTO(savedOrder);
     }
@@ -133,15 +154,18 @@ public class OrderService {
      *
      * @param request Datos de devolución e incidencias.
      * @return DTO de la orden actualizada.
-     * @throws InvalidOrderStateException si la orden no está en un estado válido para devolución.
+     * @throws InvalidOrderStateException si la orden no está en un estado válido
+     *                                    para devolución.
      */
     @Transactional
     public OrderResponseDTO processOrderReturn(ReturnOrderRequestDTO request) {
         Order order = orderRepository.findById(request.orderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Contrato u orden no encontrada con ID: " + request.orderId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Contrato u orden no encontrada con ID: " + request.orderId()));
 
         if (order.getEstado() != OrderStatus.EN_ALQUILER && order.getEstado() != OrderStatus.CONFIRMADA) {
-            throw new InvalidOrderStateException("La orden debe estar en estado EN_ALQUILER o CONFIRMADA para procesar la devolución.");
+            throw new InvalidOrderStateException(
+                    "La orden debe estar en estado EN_ALQUILER o CONFIRMADA para procesar la devolución.");
         }
 
         LocalDateTime fechaDevolucionReal = LocalDateTime.now();
@@ -151,7 +175,8 @@ public class OrderService {
         if (request.incidencias() != null && !request.incidencias().isEmpty()) {
             for (IncidentRequestDTO incDto : request.incidencias()) {
                 Garment garment = garmentRepository.findById(incDto.garmentId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Prenda no encontrada con ID: " + incDto.garmentId()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Prenda no encontrada con ID: " + incDto.garmentId()));
 
                 ReturnIncident incident = ReturnIncident.create(
                         order,
@@ -159,21 +184,22 @@ public class OrderService {
                         incDto.tipoIncidencia(),
                         incDto.montoDescuentoGarantia(),
                         incDto.descripcion(),
-                        request.updatedBy()
-                );
+                        request.updatedBy());
                 returnIncidentRepository.save(incident);
                 totalDescuentoGarantia = totalDescuentoGarantia.add(incDto.montoDescuentoGarantia());
             }
         }
 
-        BigDecimal montoPenalizacion = request.montoPenalizacionMora() != null ? request.montoPenalizacionMora() : BigDecimal.ZERO;
+        BigDecimal montoPenalizacion = request.montoPenalizacionMora() != null ? request.montoPenalizacionMora()
+                : BigDecimal.ZERO;
         order.registrarDevolucion(fechaDevolucionReal, totalDescuentoGarantia, montoPenalizacion, request.updatedBy());
 
-        // Actualización de prendas e inicio automático del bloqueo de tintorería (RF-05, RF-11, RF-12)
+        // Actualización de prendas e inicio automático del bloqueo de tintorería
+        // (RF-05, RF-11, RF-12)
         for (OrderItem item : order.getItems()) {
             if (item.getTipoItem() == OrderItemType.ALQUILER) {
                 Garment garment = item.getGarment();
-                
+
                 // Incremento de trazabilidad de uso (RF-12)
                 garment.registrarUso(request.updatedBy());
 
@@ -190,9 +216,17 @@ public class OrderService {
                         BigDecimal.ZERO,
                         "Bloqueo automático pos-alquiler (Tintorería / Lavandería)",
                         "Personal de Almacén",
-                        request.updatedBy()
-                );
+                        request.updatedBy());
                 maintenanceRecordRepository.save(record);
+
+                // Trazabilidad de historia de estado (Patrón Extraído de C#)
+                GarmentStatusHistory history = GarmentStatusHistory.create(
+                        garment,
+                        GarmentStatus.ALQUILADO,
+                        GarmentStatus.EN_TINTORERIA,
+                        "Devolución de contrato " + order.getCodigoContrato() + " - Bloqueo de lavandería preventivo",
+                        request.updatedBy());
+                garmentStatusHistoryRepository.save(history);
 
                 // Cambio de estado a EN_TINTORERIA (RF-11)
                 garment.enviarATintoreria(request.updatedBy());
@@ -201,11 +235,35 @@ public class OrderService {
         }
 
         Order updatedOrder = orderRepository.save(order);
+        BigDecimal garantiaDevuelta = mapToResponseDTO(updatedOrder).garantiaDevueltaNeta();
+        eventPublisher.publish(new OrderReturnedEvent(updatedOrder.getId(), updatedOrder.getCodigoContrato(),
+                totalDescuentoGarantia, garantiaDevuelta));
         return mapToResponseDTO(updatedOrder);
     }
 
     /**
-     * Mapea una entidad {@link Order} a su DTO de respuesta calculando la garantía devuelta neta.
+     * Obtiene el listado completo de órdenes y contratos registrados.
+     */
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(this::mapToResponseDTO)
+                .toList();
+    }
+
+    /**
+     * Obtiene las órdenes pertenecientes a una tienda específica.
+     */
+    @Transactional(readOnly = true)
+    public List<OrderResponseDTO> getOrdersByStore(Long storeId) {
+        return orderRepository.findByStoreId(storeId).stream()
+                .map(this::mapToResponseDTO)
+                .toList();
+    }
+
+    /**
+     * Mapea una entidad {@link Order} a su DTO de respuesta calculando la garantía
+     * devuelta neta.
      */
     private OrderResponseDTO mapToResponseDTO(Order order) {
         BigDecimal garantiaDevueltaNeta = order.getMontoGarantiaTotal()
@@ -215,6 +273,18 @@ public class OrderService {
         if (garantiaDevueltaNeta.compareTo(BigDecimal.ZERO) < 0) {
             garantiaDevueltaNeta = BigDecimal.ZERO;
         }
+
+        List<OrderItemResponseDTO> itemDTOs = order.getItems() != null ? order.getItems().stream()
+                .map(item -> new OrderItemResponseDTO(
+                        item.getId(),
+                        item.getGarment() != null ? item.getGarment().getId() : null,
+                        item.getGarment() != null ? item.getGarment().getNombre() : "Prenda",
+                        item.getGarment() != null ? item.getGarment().getCodigoUnico() : "SKU",
+                        item.getTipoItem(),
+                        item.getPrecioAplicado(),
+                        item.getGarantiaAplicada()
+                ))
+                .toList() : List.of();
 
         return new OrderResponseDTO(
                 order.getId(),
@@ -231,7 +301,7 @@ public class OrderService {
                 order.getMontoPenalizacion(),
                 order.getMontoTotal(),
                 garantiaDevueltaNeta,
-                order.getEstado()
-        );
+                order.getEstado(),
+                itemDTOs);
     }
 }

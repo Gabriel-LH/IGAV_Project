@@ -28,6 +28,29 @@ public class OrderController {
     }
 
     /**
+     * Endpoint para listar todos los contratos u órdenes registradas en la base de datos.
+     *
+     * @return Lista de contratos registrados.
+     */
+    @GetMapping
+    @Operation(summary = "Listar todas las órdenes", description = "Obtiene el listado completo de contratos y alquileres registrados en la BD")
+    public ResponseEntity<java.util.List<OrderResponseDTO>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    /**
+     * Endpoint para listar los contratos pertenecientes a una tienda específica (Aislamiento por Tenant).
+     *
+     * @param storeId ID de la tienda.
+     * @return Lista de contratos de la tienda.
+     */
+    @GetMapping("/store/{storeId}")
+    @Operation(summary = "Listar órdenes por tienda", description = "Obtiene los contratos de alquiler de la tienda indicada")
+    public ResponseEntity<java.util.List<OrderResponseDTO>> getOrdersByStore(@PathVariable Long storeId) {
+        return ResponseEntity.ok(orderService.getOrdersByStore(storeId));
+    }
+
+    /**
      * Endpoint para registrar un nuevo contrato de alquiler u orden de venta (RF-04, RF-06, RF-08).
      *
      * @param request Datos de la orden.

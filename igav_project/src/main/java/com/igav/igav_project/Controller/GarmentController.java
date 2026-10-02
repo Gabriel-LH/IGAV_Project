@@ -5,7 +5,6 @@ import com.igav.igav_project.Model.Entity.Inventory.GarmentStatus;
 import com.igav.igav_project.Service.GarmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +32,17 @@ public class GarmentController {
      * @param storeId ID de la tienda.
      * @return Lista de prendas.
      */
+    /**
+     * Endpoint para consultar todo el inventario de prendas de la plataforma.
+     *
+     * @return Lista completa de prendas.
+     */
+    @GetMapping
+    @Operation(summary = "Listar todas las prendas", description = "Obtiene el catálogo maestro de prendas registradas en el sistema")
+    public ResponseEntity<List<Garment>> getAllGarments() {
+        return ResponseEntity.ok(garmentService.getAllGarments());
+    }
+
     @GetMapping("/store/{storeId}")
     @Operation(summary = "Listar prendas por tienda", description = "Obtiene el catálogo de prendas pertenecientes al tenant/tienda especificado (RF-01, RF-03)")
     public ResponseEntity<List<Garment>> getGarmentsByStore(@PathVariable Long storeId) {

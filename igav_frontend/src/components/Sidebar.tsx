@@ -11,7 +11,8 @@ import {
   Users,
   Building2,
   Shield,
-  Scissors
+  Scissors,
+  Crown
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -25,7 +26,17 @@ interface SidebarProps {
   customerCount: number;
   userCount: number;
   tailoringCount: number;
+  userRole?: string;
 }
+
+export const roleAccessMap: Record<string, TabType[]> = {
+  SUPER_ADMIN: ['dashboard', 'garments', 'customers', 'orders', 'tailoring', 'laundry', 'alerts', 'stores', 'users'],
+  ADMIN_SAAS: ['dashboard', 'garments', 'customers', 'orders', 'tailoring', 'laundry', 'alerts', 'stores', 'users'],
+  ADMIN_TIENDA: ['dashboard', 'garments', 'customers', 'orders', 'tailoring', 'laundry', 'alerts', 'stores'],
+  VENDEDOR: ['dashboard', 'garments', 'customers', 'orders', 'tailoring'],
+  ENCARGADO_ALMACEN_TINTORERIA: ['dashboard', 'garments', 'laundry', 'alerts'],
+  ENCARGADO_TINTORERIA: ['dashboard', 'garments', 'laundry', 'alerts']
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   activeTab, 
@@ -34,76 +45,101 @@ export const Sidebar: React.FC<SidebarProps> = ({
   laundryCount,
   customerCount,
   userCount,
-  tailoringCount
+  tailoringCount,
+  userRole = 'SUPER_ADMIN'
 }) => {
-  const menuItems = [
+  const allMenuItems = [
     {
       id: 'dashboard' as TabType,
-      label: 'Panel General',
+      label: 'Salón Principal',
       icon: LayoutDashboard,
       badge: null
     },
     {
       id: 'garments' as TabType,
-      label: 'Catálogo de Prendas',
+      label: 'Archivo de Vestuario',
       icon: Shirt,
       badge: null
     },
     {
       id: 'customers' as TabType,
-      label: 'Maestro de Clientes',
+      label: 'Directorio de Huéspedes',
       icon: Users,
       badge: customerCount > 0 ? customerCount : null,
-      badgeColor: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+      badgeColor: 'bg-[var(--accent-sage-light)] text-[var(--accent-sage)] border-[var(--accent-sage)]/30'
     },
     {
       id: 'orders' as TabType,
-      label: 'Alquileres & Reservas',
+      label: 'Contratos de Custodia',
       icon: CalendarCheck,
       badge: null
     },
     {
       id: 'tailoring' as TabType,
-      label: 'Taller de Sastrería',
+      label: 'Taller & Entalle Fino',
       icon: Scissors,
       badge: tailoringCount > 0 ? tailoringCount : null,
-      badgeColor: 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30'
+      badgeColor: 'bg-[var(--accent-gold-light)] text-[var(--accent-gold)] border-[var(--accent-gold)]/30'
     },
     {
       id: 'laundry' as TabType,
-      label: 'Recepción & Tintorería',
+      label: 'Vaporizado & Cuidados',
       icon: Clock,
       badge: laundryCount > 0 ? laundryCount : null,
-      badgeColor: 'bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30'
+      badgeColor: 'bg-[var(--accent-burgundy-light)] text-[var(--accent-burgundy)] border-[var(--accent-burgundy)]/30'
     },
     {
       id: 'alerts' as TabType,
-      label: 'Alertas de Desgaste',
+      label: 'Inspección de Fibras',
       icon: AlertTriangle,
       badge: rotationAlertCount > 0 ? rotationAlertCount : null,
-      badgeColor: 'bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30'
+      badgeColor: 'bg-[var(--accent-burgundy-light)] text-[var(--accent-burgundy)] border-[var(--accent-burgundy)]/30'
     },
     {
       id: 'stores' as TabType,
-      label: 'Sedes & Multi-tenant',
+      label: 'Ateliers & Sedes',
       icon: Building2,
       badge: null
     },
     {
       id: 'users' as TabType,
-      label: 'Staff & Roles (RF-02)',
+      label: 'Maestros & Conserjes',
       icon: Shield,
       badge: userCount > 0 ? userCount : null,
-      badgeColor: 'bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30'
+      badgeColor: 'bg-[var(--surface-elevated)] text-[var(--text-secondary)] border-[var(--border-subtle)]'
     }
   ];
 
+  // RBAC Access Filter
+  const normalizedRole = userRole.toUpperCase();
+  const allowed = roleAccessMap[normalizedRole] || roleAccessMap.VENDEDOR;
+  const menuItems = allMenuItems.filter(item => allowed.includes(item.id));
+
   return (
-    <aside className="w-64 shrink-0 glass-panel border-r border-[var(--glass-border)] p-4 flex flex-col justify-between hidden md:flex min-h-[calc(100vh-65px)] transition-colors duration-200">
+    <aside className="w-64 shrink-0 bg-[var(--surface-card)] border-r border-[var(--border-subtle)] p-4 flex flex-col justify-between hidden md:flex min-h-[calc(100vh-65px)] transition-colors duration-300">
       <div className="space-y-6">
+        {/* Role Badge Indicator */}
+        <div className="px-3 py-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {normalizedRole.includes('ADMIN') ? (
+              <Crown className="w-3.5 h-3.5 text-[var(--accent-gold)]" />
+            ) : normalizedRole.includes('TINTORERIA') ? (
+              <Clock className="w-3.5 h-3.5 text-[var(--accent-burgundy)]" />
+            ) : (
+              <Sparkles className="w-3.5 h-3.5 text-[var(--accent-sage)]" />
+            )}
+            <span className="text-[10px] font-mono uppercase tracking-[0.16em] text-[var(--text-secondary)]">
+              {normalizedRole.replace('_', ' ')}
+            </span>
+          </div>
+          <span className="text-[9px] font-mono px-1.5 py-0.5 bg-[var(--surface-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
+            Activo
+          </span>
+        </div>
+
         <div>
-          <p className="px-3 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2.5">
-            Módulos Principales
+          <p className="px-3 text-[9px] font-mono font-medium text-[var(--text-tertiary)] uppercase tracking-[0.24em] mb-2.5">
+            Salones de Gestión
           </p>
           <nav className="space-y-1">
             {menuItems.map((item) => {
@@ -114,19 +150,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={item.id}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveTab(item.id)}
-                  className={'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all duration-200 ' +
-                    (isActive
-                      ? 'bg-amber-500/15 text-amber-800 dark:text-amber-400 border border-amber-500/30 shadow-sm font-bold'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--card-bg)] border border-transparent')
-                  }
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs font-mono transition-all duration-200 border ${
+                    isActive
+                      ? 'bg-[var(--surface-elevated)] text-[var(--text-primary)] border-[var(--border-subtle)] border-l-2 border-l-[var(--accent-gold)] font-medium shadow-sm'
+                      : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-subtle)]'
+                  }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={'w-4 h-4 ' + (isActive ? 'text-amber-500' : 'text-[var(--text-secondary)]')} />
-                    <span>{item.label}</span>
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[var(--accent-gold)]' : 'text-[var(--text-tertiary)]'}`} />
+                    <span className="font-sans-editorial text-xs">{item.label}</span>
                   </div>
 
                   {item.badge !== null && (
-                    <span className={'px-2 py-0.5 text-[10px] font-extrabold rounded-full border ' + item.badgeColor}>
+                    <span className={`px-1.5 py-0.2 text-[9px] font-mono border ${item.badgeColor}`}>
                       {item.badge}
                     </span>
                   )}
@@ -135,43 +171,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </nav>
         </div>
-
-        <div className="pt-4 border-t border-[var(--glass-border)]">
-          <p className="px-3 text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2.5">
-            Reglas de Negocio
-          </p>
-          <div className="space-y-2 px-3 text-[11px] text-[var(--text-secondary)] font-medium">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span>RF-01 Multi-tenant Isolator</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-              <span>RF-02 Role Security & BCrypt</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-              <span>RF-04 Date Collision Guard</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-              <span>RF-05 24h-48h Tintorería Block</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-              <span>RF-12 Max Wear Counter</span>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-[var(--text-secondary)]">
-        <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400 mb-1">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Gala Wear System</span>
-        </div>
-        <p className="text-[11px] leading-relaxed">
-          Control total de prendas de etiqueta, liquidación de garantías y ciclos de tintorería.
+      {/* Footer Branding */}
+      <div className="pt-4 border-t border-[var(--border-subtle)] space-y-1">
+        <p className="text-[9px] uppercase tracking-[0.2em] font-mono text-[var(--text-tertiary)]">
+          Maison I.G.A.V. — París & Lima
+        </p>
+        <p className="font-serif-editorial text-xs italic text-[var(--text-secondary)]">
+          Custodia y Arquitectura Textil
         </p>
       </div>
     </aside>

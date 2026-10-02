@@ -13,7 +13,7 @@ import jakarta.persistence.Embeddable;
 public record Telefono(String value) {
 
     /**
-     * Constructor compacto para aplicar validaciones de formato telefónico.
+     * Constructor compacto para aplicar sanitización y validaciones de formato telefónico.
      *
      * @throws IllegalArgumentException si el teléfono es nulo, está vacío o no coincide con la sintaxis esperada.
      */
@@ -21,6 +21,7 @@ public record Telefono(String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("El número de teléfono no puede estar vacío.");
         }
+        value = value.replaceAll("[\\s\\-\\(\\)]", "");
         if (!value.matches("^\\+?\\d{9,12}$")) {
             throw new IllegalArgumentException("El formato del número de teléfono no es válido.");
         }

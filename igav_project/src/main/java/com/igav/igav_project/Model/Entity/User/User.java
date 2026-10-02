@@ -8,6 +8,7 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Entidad JPA que representa a un Usuario dentro del sistema I.G.A.V.
@@ -18,6 +19,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
     @Id

@@ -7,6 +7,7 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Entidad JPA que representa una Tienda / Negocio dentro de la plataforma SaaS multi-tienda.
@@ -16,6 +17,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "stores")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Store {
 
     @Id
