@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanFeature.PlanFeature;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanLimit.PlanLimit;
-import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlonModule.PlanModule;
+import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanModule.PlanModule;
 import com.igav.igav_project.Model.Shared.ValueObjects.Moneda;
 
 import jakarta.persistence.*;

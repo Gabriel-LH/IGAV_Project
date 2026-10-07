@@ -9,10 +9,6 @@ package com.igav.igav_project.Model.Entity.User;
 public enum GlobalRole {
     /** Administrador global del SaaS multitennant */
     SUPER_ADMIN,
-    /** Administrador o dueño de una tienda específica */
-    ADMIN_TIENDA,
-    /** Personal encargado de ventas y alquileres directos */
-    VENDEDOR,
-    /** Operador a cargo del inventario, lavandería y mantenimiento de prendas */
-    ENCARGADO_ALMACEN_TINTORERIA
+    /** Cualquier usuario que necesita hacer un login */
+    USER
 }

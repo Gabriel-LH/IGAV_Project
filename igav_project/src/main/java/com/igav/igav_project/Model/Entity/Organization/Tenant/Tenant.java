@@ -2,9 +2,15 @@ package com.igav.igav_project.Model.Entity.Organization.Tenant;
 
 import java.util.List;
 
-import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanFeature.PlanFeature;
+import com.igav.igav_project.Model.Entity.Commerce.Operation.Operation;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
+import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
+import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.Plan;
+import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantModule.TenantModule;
+import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantSubscription.TenantSubscription;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
-
+import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 
 import jakarta.persistence.*;
@@ -22,6 +28,14 @@ public class Tenant {
     
     @Column (name = "slug", nullable = false, length = 100)
     public String Slug;
+    @Column(name = "razon_social", nullable = false, length = 150)
+    private String razonSocial;
+
+    @Embedded
+    @AttributeOverride(name = "numero", column = @Column(name = "ruc_numero", nullable = false, unique = true))
+    @AttributeOverride(name = "tipo", column = @Column(name = "ruc_tipo", nullable = false))
+    private DocumentoIdentidad ruc;
+
     @Column (name = "owner_id", nullable = false, length = 100)
     public String OwnerId;
     @Column (name = "metadata", nullable = true, columnDefinition = "TEXT")
@@ -33,9 +47,26 @@ public class Tenant {
     @Enumerated(EnumType.STRING)
     @Column (name = "tenant_status", nullable = false, length = 50)
     public TenantStatus TenantStatus;
-    
-    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PlanFeature> planFeatures;
+
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Plan> plans;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Module> modules;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TenantModule> tenantModules;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TenantSubscription> tenantSubscriptions;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Branch> branchs;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Operation> operations;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rental> rentals;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservations;
+
+
+
 
     public Tenant(String nombre, String slug, String ownerId, JsonObject metadata, JsonObject tenantConfig,
             AuditMetadata auditMetadata, TenantStatus tenantStatus) {

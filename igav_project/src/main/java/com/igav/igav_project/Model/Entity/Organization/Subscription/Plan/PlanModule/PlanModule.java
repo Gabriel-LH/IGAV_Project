@@ -1,4 +1,4 @@
-package com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlonModule;
+package com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanModule;
 
 import java.util.Dictionary;
 import java.util.List;

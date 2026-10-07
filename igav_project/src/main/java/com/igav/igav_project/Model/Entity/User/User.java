@@ -1,6 +1,6 @@
 package com.igav.igav_project.Model.Entity.User;
 
-import com.igav.igav_project.Model.Entity.Store.Store;
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
@@ -8,6 +8,10 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -57,9 +61,13 @@ public class User {
     @Embedded
     private Address address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = true)
-    private Store store;
+    @ManyToMany
+    @JoinTable(
+        name = "user_branch", // Nombre de la tabla intermedia
+        joinColumns = @JoinColumn(name = "user_id"), // FK hacia la tabla User
+        inverseJoinColumns = @JoinColumn(name = "branch_id") // FK hacia la tabla Branch
+    )
+    private Set<Branch> branches = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status_user", nullable = false)
@@ -90,7 +98,6 @@ public class User {
             Telefono telefono,
             GlobalRole globalRole,
             Address address,
-            Store store,
             String createdBy
     ) {
         this.nombres = nombres;
@@ -101,7 +108,6 @@ public class User {
         this.telefono = telefono;
         this.globalRole = globalRole;
         this.address = address;
-        this.store = store;
         this.emailVerified = false;
         this.telefonoVerified = false;
         this.statusUser = StatusUser.ACTIVO;
@@ -132,10 +138,9 @@ public class User {
             Telefono telefono,
             GlobalRole globalRole,
             Address address,
-            Store store,
             String createdBy
     ) {
-        return new User(nombres, apellidos, email, documentoIdentidad, image, telefono, globalRole, address, store, createdBy);
+        return new User(nombres, apellidos, email, documentoIdentidad, image, telefono, globalRole, address, createdBy);
     }
 
     /**
@@ -168,7 +173,13 @@ public class User {
         this.auditMetadata = this.auditMetadata.update(updatedBy);
     }
 
+
+    public void setBranches(Set<Branch> branches) {
+        this.branches = branches;
+    }
+
     // Getters para exponer el estado de forma segura
+    public Set<Branch> getBranches() { return branches; }
     public Long getId() { return id; }
     public String getNombres() { return nombres; }
     public String getApellidos() { return apellidos; }
@@ -179,7 +190,6 @@ public class User {
     public Telefono getTelefono() { return telefono; }
     public boolean isTelefonoVerified() { return telefonoVerified; }
     public Address getAddress() { return address; }
-    public Store getStore() { return store; }
     public StatusUser getStatusUser() { return statusUser; }
     public GlobalRole getGlobalRole() { return globalRole; }
     public AuditMetadata getAuditMetadata() { return auditMetadata; }
