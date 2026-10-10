@@ -2,6 +2,9 @@ package com.igav.igav_project.Model.Entity.Organization.Tenant;
 
 import java.util.List;
 
+import com.igav.igav_project.Model.Entity.Catalog.Attribute.AttributeType.AttributeType;
+import com.igav.igav_project.Model.Entity.Catalog.Brand.Brand;
+import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
 import com.igav.igav_project.Model.Entity.Commerce.Operation.Operation;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
@@ -64,6 +67,13 @@ public class Tenant {
     private List<Rental> rentals;
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Guarantee> guarantees;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Brand> brands;
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AttributeType> attributeTypes;
+
 
 
 

@@ -3,6 +3,7 @@ package com.igav.igav_project.Model.Entity.Client;
 import java.util.Date;
 import java.util.List;
 
+import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
 import com.igav.igav_project.Model.Shared.ValueObjects.*;
 
@@ -45,6 +46,8 @@ public class Client {
 
     @OneToMany (mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
+    @OneToMany (mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rental> rentals;
 
 
     public Client(String tenantId, DocumentoIdentidad documentoIdentidad, NombrePersona nombrePersona, String email,

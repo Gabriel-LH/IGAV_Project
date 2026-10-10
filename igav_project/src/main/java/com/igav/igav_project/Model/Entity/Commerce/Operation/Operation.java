@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Client.Client;
+import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
@@ -44,7 +45,7 @@ public class Operation {
     private CustomerMode customerMode;
 
     @JoinColumn (name = "client_id", nullable = false)
-    @OneToMany (fetch = FetchType.LAZY)
+    @ManyToOne  (fetch = FetchType.LAZY)
     private Client client;
 
     @Enumerated (EnumType.STRING)
@@ -95,9 +96,13 @@ public class Operation {
     // Una Operación contiene MUCHOS ítems alquilados
     @OneToMany(mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rental> rentals = new ArrayList<>();
-
     @OneToMany(mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
+    @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Guarantee> guarantees;
+
+
+
 
     public Operation() {
     }

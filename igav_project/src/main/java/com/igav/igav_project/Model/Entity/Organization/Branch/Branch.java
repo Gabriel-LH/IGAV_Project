@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Entity.User.User;
@@ -52,7 +54,11 @@ public class Branch {
 
     @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations;
-    
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rental> rentals;
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Guarantee> guarantees;
+
     public Branch() {
     }
 
