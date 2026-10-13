@@ -1,6 +1,7 @@
 package com.igav.igav_project.Model.Entity.Commerce.Reservation;
 
 import java.util.Date;
+import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Client.Client;
 import com.igav.igav_project.Model.Entity.Commerce.Operation.Operation;
@@ -58,6 +59,9 @@ public class Reservation {
     @Embedded 
     @Column (name = "audit_metadata", nullable = false)
     private AuditMetadata auditMetadata;
+
+    @OneToMany (mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationItem> reservationItems;
 
 
 

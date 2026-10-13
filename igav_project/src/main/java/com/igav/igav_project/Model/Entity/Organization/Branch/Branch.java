@@ -7,6 +7,7 @@ import java.util.Set;
 import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Entity.User.User;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
@@ -58,6 +59,8 @@ public class Branch {
     private List<Rental> rentals;
     @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Guarantee> guarantees;
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InventoryItem> inventoryItems;
 
     public Branch() {
     }

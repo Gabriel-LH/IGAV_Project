@@ -7,24 +7,21 @@ import java.util.List;
 import java.util.Map;
 
 import com.igav.igav_project.Model.Entity.Catalog.Product.Product;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
+import com.igav.igav_project.Model.Entity.Commerce.Reservation.ReservationItem;
+import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapKeyColumn;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity 
 @Table (name = "product_variants")
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder 
 public class ProductVariant {
 
     @Id 
@@ -48,6 +45,7 @@ public class ProductVariant {
     @CollectionTable(name = "product_variant_attributes", joinColumns = @JoinColumn(name = "variant_id"))
     @MapKeyColumn(name = "attribute_key")
     @Column(name = "attribute_value")
+    @Builder.Default
     private Map<String, String> attributes = new HashMap<>();
 
     @Column(name = "price_sell", precision = 12, scale = 2)
@@ -71,8 +69,21 @@ public class ProductVariant {
     @ElementCollection
     @CollectionTable(name = "product_variant_images", joinColumns = @JoinColumn(name = "variant_id"))
     @Column(name = "image_url")
+    @Builder.Default
     private List<String> imageUrl = new ArrayList<>();
 
     @Column(name = "variant_signature")
     private String variantSignature;
+
+    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ReservationItem> reservationItems = new ArrayList<>();
+
+    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<InventoryItem> inventoryItems = new ArrayList<>();
+
+    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<RentalItem> renatlItems = new ArrayList<>();
 }

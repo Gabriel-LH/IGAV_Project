@@ -90,6 +90,8 @@ public class Rental {
     // Un alquiler tiene MUCHAS garantías
     @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Guarantee> guarantees = new ArrayList<>();
+    @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RentalItem> rentalItems = new ArrayList<>();
 
 
 }

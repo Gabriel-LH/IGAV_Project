@@ -8,6 +8,7 @@ import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
 import com.igav.igav_project.Model.Entity.Commerce.Operation.Operation;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.Plan;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantModule.TenantModule;
@@ -73,7 +74,8 @@ public class Tenant {
     private List<Brand> brands;
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AttributeType> attributeTypes;
-
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InventoryItem> inventoryItems;
 
 
 

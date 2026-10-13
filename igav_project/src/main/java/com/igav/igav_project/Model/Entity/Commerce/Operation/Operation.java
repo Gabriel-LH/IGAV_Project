@@ -7,6 +7,8 @@ import java.util.List;
 import com.igav.igav_project.Model.Entity.Client.Client;
 import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalCharge;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
@@ -15,9 +17,15 @@ import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Model.Shared.ValueObjects.Moneda;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity 
 @Table (name = "operations")
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder 
 public class Operation {
 
     @Id 
@@ -95,19 +103,19 @@ public class Operation {
 
     // Una Operación contiene MUCHOS ítems alquilados
     @OneToMany(mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Rental> rentals = new ArrayList<>();
     @OneToMany(mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Reservation> reservations = new ArrayList<>();
     @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Guarantee> guarantees;
-
-
-
-
-    public Operation() {
-    }
-
-
-
+    @Builder.Default
+    private List<Guarantee> guarantees = new ArrayList<>();
+    @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<RentalItem> rentalItems = new ArrayList<>();
+    @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<RentalCharge> rentalCharges = new ArrayList<>();
 
 }
