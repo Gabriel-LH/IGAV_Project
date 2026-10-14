@@ -7,6 +7,7 @@ import com.igav.igav_project.Model.Entity.Catalog.Brand.Model.Model;
 import com.igav.igav_project.Model.Entity.Catalog.Category.Category;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.ReservationItem;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.SaleItem;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -75,5 +76,8 @@ public class Product {
     @OneToMany (mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RentalItem> rentalItems = new ArrayList<>();
+    @OneToMany (mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SaleItem> saleItems = new ArrayList<>();
 
 }

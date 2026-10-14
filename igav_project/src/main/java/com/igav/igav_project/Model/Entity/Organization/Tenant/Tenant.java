@@ -1,13 +1,18 @@
 package com.igav.igav_project.Model.Entity.Organization.Tenant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Catalog.Attribute.AttributeType.AttributeType;
 import com.igav.igav_project.Model.Entity.Catalog.Brand.Brand;
+import com.igav.igav_project.Model.Entity.Commerce.CashSession.CashSession;
 import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
 import com.igav.igav_project.Model.Entity.Commerce.Operation.Operation;
+import com.igav.igav_project.Model.Entity.Commerce.Payment.Payment;
+import com.igav.igav_project.Model.Entity.Commerce.Payment.PaymentMethod.PaymentMethod;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.Plan;
@@ -53,7 +58,7 @@ public class Tenant {
     public TenantStatus TenantStatus;
 
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Plan> plans;
+    private List<Plan> plans = new ArrayList<>();
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Module> modules;
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -75,7 +80,15 @@ public class Tenant {
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AttributeType> attributeTypes;
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InventoryItem> inventoryItems;
+    private List<InventoryItem> inventoryItems = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sale> sales = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PaymentMethod> paymentMethods = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CashSession> cashSessions = new ArrayList<>();
 
 
 

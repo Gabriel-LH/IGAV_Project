@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Catalog.Product.ProductVariant.ProductVariant;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.SaleItem;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 
@@ -63,4 +64,7 @@ public class InventoryItem {
     @OneToMany (mappedBy = "inventory_item", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RentalItem> rentalItems = new ArrayList<>();
+    @OneToMany (mappedBy = "inventory_item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SaleItem> saleItems = new ArrayList<>();
 }   

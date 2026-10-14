@@ -9,6 +9,7 @@ import java.util.Map;
 import com.igav.igav_project.Model.Entity.Catalog.Product.Product;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.ReservationItem;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.SaleItem;
 import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 
@@ -86,4 +87,7 @@ public class ProductVariant {
     @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RentalItem> renatlItems = new ArrayList<>();
+    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SaleItem> saleItems = new ArrayList<>();
 }

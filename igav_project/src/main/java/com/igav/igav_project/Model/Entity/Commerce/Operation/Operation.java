@@ -6,10 +6,13 @@ import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Client.Client;
 import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
+import com.igav.igav_project.Model.Entity.Commerce.Payment.Payment;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalCharge;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.SaleCharge;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Entity.User.User;
@@ -117,5 +120,15 @@ public class Operation {
     @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RentalCharge> rentalCharges = new ArrayList<>();
+    @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Sale> sales = new ArrayList<>();
+    @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SaleCharge> salesCharges = new ArrayList<>();
+    @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Payment> payments = new ArrayList<>();
+
 
 }

@@ -1,12 +1,16 @@
 package com.igav.igav_project.Model.Entity.Organization.Branch;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.igav.igav_project.Model.Entity.Commerce.CashSession.CashSession;
 import com.igav.igav_project.Model.Entity.Commerce.Guarantee.Guarantee;
+import com.igav.igav_project.Model.Entity.Commerce.Payment.Payment;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Entity.User.User;
@@ -16,9 +20,14 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 
 import jakarta.persistence.*;
-
+import lombok.*;
 @Entity 
 @Table (name = "branches")
+@Getter 
+@Setter 
+@AllArgsConstructor 
+@NoArgsConstructor 
+@Builder 
 public class Branch {
     
     @Id 
@@ -51,19 +60,31 @@ public class Branch {
     private AuditMetadata auditMetadata;
 
     @ManyToMany(mappedBy = "branches")
+    @Builder.Default
     private Set<User> users = new HashSet<>();
 
     @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reservation> reservations;
+     @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
     @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rental> rentals;
+    @Builder.Default
+    private List<Rental> rentals = new ArrayList<>();
     @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Guarantee> guarantees;
+    @Builder.Default
+    private List<Guarantee> guarantees = new ArrayList<>(); 
     @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InventoryItem> inventoryItems;
+    @Builder.Default
+    private List<InventoryItem> inventoryItems = new ArrayList<>();
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Sale> sales = new ArrayList<>();
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Payment> payments = new ArrayList<>();
+    @OneToMany (mappedBy = "brach", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CashSession> cashSessions = new ArrayList<>();
 
-    public Branch() {
-    }
 
     public Branch(Long id, Tenant tenant, String code, String name, Address address, Telefono telefono, Email email,
             String timezone, boolean isPrimary, StatusBranch status, AuditMetadata auditMetadata) {

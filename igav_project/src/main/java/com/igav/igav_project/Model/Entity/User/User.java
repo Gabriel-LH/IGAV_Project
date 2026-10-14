@@ -1,5 +1,6 @@
 package com.igav.igav_project.Model.Entity.User;
 
+import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
@@ -8,8 +9,11 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -24,6 +28,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "users")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder 
 public class User {
 
     @Id
@@ -67,6 +76,7 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"), // FK hacia la tabla User
         inverseJoinColumns = @JoinColumn(name = "branch_id") // FK hacia la tabla Branch
     )
+    @Builder.Default
     private Set<Branch> branches = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
@@ -80,11 +90,9 @@ public class User {
     @Embedded
     private AuditMetadata auditMetadata;
 
-    /**
-     * Constructor vacío requerido obligatoriamente por JPA / Hibernate.
-     */
-    protected User() {
-    }
+    @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Sale> sales = new ArrayList<>();
 
     /**
      * Constructor privado para forzar la instanciación a través del método de fábrica estático.

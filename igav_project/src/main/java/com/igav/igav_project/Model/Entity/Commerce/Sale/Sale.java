@@ -2,36 +2,61 @@ package com.igav.igav_project.Model.Entity.Commerce.Sale;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.igav.igav_project.Model.Entity.Client.Client;
 import com.igav.igav_project.Model.Entity.Commerce.Operation.CustomerMode;
+import com.igav.igav_project.Model.Entity.Commerce.Operation.Operation;
+import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
+import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
+import com.igav.igav_project.Model.Entity.User.User;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Entity 
+@Table (name = "sales")
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder 
 public class Sale {
 
-    @Column(name = "tenant_id", nullable = false)
-    private UUID tenantId;
+    @Id 
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "operation_id", nullable = false)
-    private UUID operationId;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private Tenant tenant;
+
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "operation_id", nullable = false)
+    private Operation operation;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "customer_mode", nullable = false)
     private CustomerMode customerMode;
 
-    @Column(name = "customer_id")
-    private UUID customerId;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Client client;
 
-    @Column(name = "branch_id", nullable = false)
-    private UUID branchId;
+    @ManyToOne (fetch = FetchType.LAZY )
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
 
-    @Column(name = "seller_id")
-    private String sellerId;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
+    private User seller;
 
-    @Column(name = "reservation_id", nullable = false)
-    private UUID reservationId;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id", nullable = false)
+    private Reservation reservation;
 
     @Column(name = "total_amount", precision = 12, scale = 2, nullable = false)
     private BigDecimal totalAmount;
@@ -47,6 +72,10 @@ public class Sale {
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
+
+    @Enumerated (EnumType.STRING)
+    @Column (name = "status", nullable = false)
+    private SaleStatus status;
 
     @Column(name = "out_date")
     private LocalDateTime outDate;
@@ -65,4 +94,9 @@ public class Sale {
 
     @Embedded
     private AuditMetadata auditMetadata;
+
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true) 
+    @Builder.Default
+    private List<SaleItem> saleItems = new ArrayList<>();
+
 }

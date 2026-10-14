@@ -1,16 +1,24 @@
 package com.igav.igav_project.Model.Entity.Client;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Shared.ValueObjects.*;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity 
 @Table(name = "clients")
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder 
 public class Client {
 
     @Id
@@ -40,14 +48,22 @@ public class Client {
     @Column (name = "internal_notes", nullable = true, length = 255)
     public String InternalNotes;
     @Column (name = "metadata", nullable = true, columnDefinition = "TEXT")
+    @Builder.Default
     public String Metadata = "{}"; //Posible metadata mas adelante
     @Embedded
     public AuditMetadata AuditMetadata; // O dividir en strings
 
     @OneToMany (mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reservation> reservations;
+    @Builder.Default
+    private List<Reservation> reservations = new ArrayList<>();
     @OneToMany (mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rental> rentals;
+    @Builder.Default
+    private List<Rental> rentals = new ArrayList<>();
+    @OneToMany (mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Sale> sales = new ArrayList<>();
+    
+
 
 
     public Client(String tenantId, DocumentoIdentidad documentoIdentidad, NombrePersona nombrePersona, String email,

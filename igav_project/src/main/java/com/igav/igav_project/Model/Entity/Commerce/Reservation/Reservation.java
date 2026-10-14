@@ -1,19 +1,27 @@
 package com.igav.igav_project.Model.Entity.Commerce.Reservation;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.igav.igav_project.Model.Entity.Client.Client;
 import com.igav.igav_project.Model.Entity.Commerce.Operation.Operation;
+import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.nimbusds.openid.connect.sdk.federation.api.OperationType;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity 
 @Table (name = "reservations")
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
+@Builder 
 public class Reservation {
 
     @Id 
@@ -61,7 +69,14 @@ public class Reservation {
     private AuditMetadata auditMetadata;
 
     @OneToMany (mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReservationItem> reservationItems;
+    @Builder.Default
+    private List<ReservationItem> reservationItems = new ArrayList<>();
+    
+    @OneToMany (mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Sale> sales = new ArrayList<>();
+
+
 
 
 
