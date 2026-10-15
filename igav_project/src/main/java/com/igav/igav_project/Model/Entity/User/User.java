@@ -1,6 +1,7 @@
 package com.igav.igav_project.Model.Entity.User;
 
 import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
+import com.igav.igav_project.Model.Entity.Inventory.StockAdjustment.StockAdjustment;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
@@ -93,6 +94,10 @@ public class User {
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Sale> sales = new ArrayList<>();
+
+    @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<StockAdjustment> stockAdjustments  = new ArrayList<>();
 
     /**
      * Constructor privado para forzar la instanciación a través del método de fábrica estático.

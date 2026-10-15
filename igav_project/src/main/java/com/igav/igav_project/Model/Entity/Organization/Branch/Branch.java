@@ -12,6 +12,11 @@ import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
 import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
+import com.igav.igav_project.Model.Entity.Inventory.Movement.InventoryMovement;
+import com.igav.igav_project.Model.Entity.Inventory.ProductVariantStock.ProductVariantStock;
+import com.igav.igav_project.Model.Entity.Inventory.StockAdjustment.StockAdjustment;
+import com.igav.igav_project.Model.Entity.Inventory.Transfer.Transfer;
+import com.igav.igav_project.Model.Entity.Inventory.Transfer.TransferRoute.TransferRoute;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Entity.User.User;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
@@ -84,6 +89,29 @@ public class Branch {
     @OneToMany (mappedBy = "brach", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<CashSession> cashSessions = new ArrayList<>();
+    @OneToMany (mappedBy = "brach", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<InventoryMovement> inventoryMovements = new ArrayList<>();
+    @OneToMany (mappedBy = "brach", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductVariantStock> productVariantStocks = new ArrayList<>();
+    @OneToMany (mappedBy = "sourceBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Transfer> outTransfers  = new ArrayList<>();
+    @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Transfer> incomeTransfers  = new ArrayList<>();
+    @OneToMany (mappedBy = "originBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<TransferRoute> outRoutes  = new ArrayList<>();
+    @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<TransferRoute> incomeRoute  = new ArrayList<>();
+    @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<StockAdjustment> stockAdjustments  = new ArrayList<>();
+    
+
 
 
     public Branch(Long id, Tenant tenant, String code, String name, Address address, Telefono telefono, Email email,

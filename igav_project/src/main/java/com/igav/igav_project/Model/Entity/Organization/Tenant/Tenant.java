@@ -14,6 +14,10 @@ import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
 import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
+import com.igav.igav_project.Model.Entity.Inventory.Movement.InventoryMovement;
+import com.igav.igav_project.Model.Entity.Inventory.ProductVariantStock.ProductVariantStock;
+import com.igav.igav_project.Model.Entity.Inventory.StockAdjustment.StockAdjustment;
+import com.igav.igav_project.Model.Entity.Inventory.Transfer.Transfer;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.Plan;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantModule.TenantModule;
@@ -89,6 +93,15 @@ public class Tenant {
     private List<PaymentMethod> paymentMethods = new ArrayList<>();
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CashSession> cashSessions = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InventoryMovement>inventoryMovements = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariantStock> productVariantStocks = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transfer> transfers = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockAdjustment> stockAdjustments = new ArrayList<>();
+
 
 
 

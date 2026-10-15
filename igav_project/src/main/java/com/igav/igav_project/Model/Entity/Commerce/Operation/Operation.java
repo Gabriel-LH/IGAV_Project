@@ -13,6 +13,7 @@ import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.Reservation;
 import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Commerce.Sale.SaleCharge;
+import com.igav.igav_project.Model.Entity.Inventory.SockLot.StockMovement.StockMovement;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Entity.User.User;
@@ -129,6 +130,9 @@ public class Operation {
     @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Payment> payments = new ArrayList<>();
+     @OneToMany (mappedBy = "operation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<StockMovement> stockMovements = new ArrayList<>();
 
 
 }

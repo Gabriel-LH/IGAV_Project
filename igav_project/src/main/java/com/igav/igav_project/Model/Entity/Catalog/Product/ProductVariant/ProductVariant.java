@@ -11,6 +11,10 @@ import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalItem;
 import com.igav.igav_project.Model.Entity.Commerce.Reservation.ReservationItem;
 import com.igav.igav_project.Model.Entity.Commerce.Sale.SaleItem;
 import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
+import com.igav.igav_project.Model.Entity.Inventory.Movement.InventoryMovement;
+import com.igav.igav_project.Model.Entity.Inventory.ProductVariantStock.ProductVariantStock;
+import com.igav.igav_project.Model.Entity.Inventory.StockAdjustment.StockAdjustmentItem;
+import com.igav.igav_project.Model.Entity.Inventory.Transfer.TransferItem;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 
 import jakarta.persistence.*;
@@ -90,4 +94,17 @@ public class ProductVariant {
     @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SaleItem> saleItems = new ArrayList<>();
+    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<InventoryMovement> inventoryMovements = new ArrayList<>();
+    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductVariantStock> productVariantStocks  = new ArrayList<>();
+    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<TransferItem> transferItems  = new ArrayList<>();
+     @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<StockAdjustmentItem> stockAdjustmentItems  = new ArrayList<>();
+
 }
