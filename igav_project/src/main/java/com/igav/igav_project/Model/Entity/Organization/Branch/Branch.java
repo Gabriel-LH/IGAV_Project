@@ -18,6 +18,7 @@ import com.igav.igav_project.Model.Entity.Inventory.StockAdjustment.StockAdjustm
 import com.igav.igav_project.Model.Entity.Inventory.Transfer.Transfer;
 import com.igav.igav_project.Model.Entity.Inventory.Transfer.TransferRoute.TransferRoute;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
+import com.igav.igav_project.Model.Entity.RecursosHumanos.MemberShip.UserTenantMemberShip;
 import com.igav.igav_project.Model.Entity.User.User;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
@@ -110,6 +111,9 @@ public class Branch {
     @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<StockAdjustment> stockAdjustments  = new ArrayList<>();
+    @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<UserTenantMemberShip> userTenantMemberShips = new ArrayList<>();
     
 
 

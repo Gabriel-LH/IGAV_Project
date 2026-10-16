@@ -1,5 +1,6 @@
 package com.igav.igav_project.Model.Entity.Organization.Tenant;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,9 @@ import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.Plan;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantModule.TenantModule;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantSubscription.TenantSubscription;
+import com.igav.igav_project.Model.Entity.RecursosHumanos.Employee.Employee;
+import com.igav.igav_project.Model.Entity.RecursosHumanos.MemberShip.UserTenantMemberShip;
+import com.igav.igav_project.Model.Entity.RecursosHumanos.Role.Role;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
 import com.nimbusds.jose.shaded.gson.JsonObject;
@@ -101,6 +105,14 @@ public class Tenant {
     private List<Transfer> transfers = new ArrayList<>();
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockAdjustment> stockAdjustments = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Employee> employees = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserTenantMemberShip> userTenantMemberShips = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Role> roles = new ArrayList<>();
+    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Permission> permissions = new ArrayList<>();
 
 
 

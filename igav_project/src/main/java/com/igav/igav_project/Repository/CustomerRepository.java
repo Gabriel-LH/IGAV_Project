@@ -1,7 +1,8 @@
 package com.igav.igav_project.Repository;
 
-import com.igav.igav_project.Model.Entity.Order.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.igav.igav_project.Model.Entity.Client.Client;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,7 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface CustomerRepository extends JpaRepository<Client, Long> {
 
     /**
      * Busca un cliente por su documento de identidad y su tienda.
@@ -20,7 +21,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      * @param storeId ID de la tienda.
      * @return Optional con el cliente.
      */
-    Optional<Customer> findByDocumentoIdentidadNumeroAndStoreId(String numero, Long storeId);
+    Optional<Client> findByDocumentoIdentidadNumeroAndStoreId(String numero, Long storeId);
 
     /**
      * Lista todos los clientes pertenecientes a una tienda.
@@ -28,6 +29,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      * @param storeId ID de la tienda.
      * @return Lista de clientes.
      */
-    List<Customer> findByStoreId(Long storeId);
+    List<Client> findByStoreId(Long storeId);
 }
 

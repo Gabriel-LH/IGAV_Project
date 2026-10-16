@@ -1,8 +1,7 @@
 package com.igav.igav_project.Config;
 
 import com.igav.igav_project.Model.Entity.Inventory.*;
-import com.igav.igav_project.Model.Entity.Order.*;
-import com.igav.igav_project.Model.Entity.Store.*;
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.User.*;
 import com.igav.igav_project.Model.Shared.ValueObjects.*;
 import com.igav.igav_project.Repository.*;
@@ -44,7 +43,7 @@ public class DataLoader implements CommandLineRunner {
         System.out.println(">>> Inicializando datos de prueba en la base de datos MySQL (igav_db)...");
 
         // 1. Tiendas (Sedes)
-        Store store1 = Store.create(
+        Branch store1 = Branch.create(
                 "Sede Central - San Isidro",
                 "IGAV Gala Luxury S.A.C.",
                 new DocumentoIdentidad(TipoDocumento.RUC, "20601234567"),

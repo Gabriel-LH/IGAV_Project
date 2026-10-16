@@ -1,7 +1,8 @@
 package com.igav.igav_project.Repository;
 
-import com.igav.igav_project.Model.Entity.Inventory.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.igav.igav_project.Model.Entity.Catalog.Category.Category;
 
 import java.util.List;
 

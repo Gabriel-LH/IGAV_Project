@@ -1,7 +1,10 @@
 package com.igav.igav_project.Controller;
 
-import com.igav.igav_project.Model.Entity.Inventory.Garment;
-import com.igav.igav_project.Model.Entity.Inventory.GarmentStatus;
+
+
+
+import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
+import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryStatus;
 import com.igav.igav_project.Service.GarmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,7 +19,7 @@ import java.util.List;
  * @author IGAV Development Team
  */
 @RestController
-@RequestMapping("/api/v1/garments")
+@RequestMapping("/api/v1/products")
 @Tag(name = "Gestión de Inventario y Catálogo", description = "Endpoints para registro, consulta y control de prendas")
 public class GarmentController {
 
@@ -39,13 +42,13 @@ public class GarmentController {
      */
     @GetMapping
     @Operation(summary = "Listar todas las prendas", description = "Obtiene el catálogo maestro de prendas registradas en el sistema")
-    public ResponseEntity<List<Garment>> getAllGarments() {
+    public ResponseEntity<List<InventoryItem>> getAllGarments() {
         return ResponseEntity.ok(garmentService.getAllGarments());
     }
 
     @GetMapping("/store/{storeId}")
     @Operation(summary = "Listar prendas por tienda", description = "Obtiene el catálogo de prendas pertenecientes al tenant/tienda especificado (RF-01, RF-03)")
-    public ResponseEntity<List<Garment>> getGarmentsByStore(@PathVariable Long storeId) {
+    public ResponseEntity<List<InventoryItem>> getGarmentsByStore(@PathVariable Long storeId) {
         return ResponseEntity.ok(garmentService.getGarmentsByStore(storeId));
     }
 
@@ -58,9 +61,9 @@ public class GarmentController {
      */
     @GetMapping("/store/{storeId}/status/{estado}")
     @Operation(summary = "Listar prendas por estado", description = "Filtra el inventario por estado actual de la prenda (RF-11)")
-    public ResponseEntity<List<Garment>> getGarmentsByStatus(
+    public ResponseEntity<List<InventoryItem>> getGarmentsByStatus(
             @PathVariable Long storeId,
-            @PathVariable GarmentStatus estado
+            @PathVariable InventoryStatus estado
     ) {
         return ResponseEntity.ok(garmentService.getGarmentsByStoreAndStatus(storeId, estado));
     }
