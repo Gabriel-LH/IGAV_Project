@@ -12,23 +12,23 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-public interface CustomerRepository extends JpaRepository<Client, Long> {
+public interface ClientRepository extends JpaRepository<Client, Long> {
 
     /**
      * Busca un cliente por su documento de identidad y su tienda.
      *
      * @param numero Número de documento (DNI/RUC).
-     * @param storeId ID de la tienda.
+     * @param tenantId ID de la tienda.
      * @return Optional con el cliente.
      */
-    Optional<Client> findByDocumentoIdentidadNumeroAndStoreId(String numero, Long storeId);
+    Optional<Client> findByDocumentoIdentidadNumeroAndTenantId(String numero, Long tenantId);
 
     /**
      * Lista todos los clientes pertenecientes a una tienda.
      *
-     * @param storeId ID de la tienda.
+     * @param tenantId ID de la tienda.
      * @return Lista de clientes.
      */
-    List<Client> findByStoreId(Long storeId);
+    List<Client> findByTenantId(Long tenantId);
 }
 
