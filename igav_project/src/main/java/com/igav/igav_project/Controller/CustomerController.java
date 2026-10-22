@@ -9,7 +9,7 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 import com.igav.igav_project.Model.Shared.ValueObjects.TipoDocumento;
 import com.igav.igav_project.Repository.CustomerRepository;
-import com.igav.igav_project.Repository.StoreRepository;
+import com.igav.igav_project.Repository.BranchRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerRepository customerRepository;
-    private final StoreRepository storeRepository;
+    private final BranchRepository storeRepository;
 
     /**
      * Constructor con inyección de dependencias para los repositorios.
@@ -39,7 +39,7 @@ public class CustomerController {
      * @param customerRepository Repositorio JPA de {@link Customer}.
      * @param storeRepository Repositorio JPA de {@link Store}.
      */
-    public CustomerController(CustomerRepository customerRepository, StoreRepository storeRepository) {
+    public CustomerController(CustomerRepository customerRepository, BranchRepository storeRepository) {
         this.customerRepository = customerRepository;
         this.storeRepository = storeRepository;
     }

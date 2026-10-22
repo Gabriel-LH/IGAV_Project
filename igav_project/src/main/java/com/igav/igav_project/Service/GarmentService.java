@@ -8,7 +8,7 @@ import com.igav.igav_project.Model.Entity.Inventory.GarmentStatus;
 import com.igav.igav_project.Model.Entity.Store.Store;
 import com.igav.igav_project.Repository.CategoryRepository;
 import com.igav.igav_project.Repository.GarmentRepository;
-import com.igav.igav_project.Repository.StoreRepository;
+import com.igav.igav_project.Repository.BranchRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +25,12 @@ import java.util.List;
 public class GarmentService {
 
     private final GarmentRepository garmentRepository;
-    private final StoreRepository storeRepository;
+    private final BranchRepository storeRepository;
     private final CategoryRepository categoryRepository;
 
     public GarmentService(
             GarmentRepository garmentRepository,
-            StoreRepository storeRepository,
+            BranchRepository storeRepository,
             CategoryRepository categoryRepository
     ) {
         this.garmentRepository = garmentRepository;

@@ -10,7 +10,7 @@ import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
 import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 import com.igav.igav_project.Model.Shared.ValueObjects.TipoDocumento;
-import com.igav.igav_project.Repository.StoreRepository;
+import com.igav.igav_project.Repository.BranchRepository;
 import com.igav.igav_project.Repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +32,7 @@ import java.util.List;
 public class UserController {
 
     private final UserRepository userRepository;
-    private final StoreRepository storeRepository;
+    private final BranchRepository storeRepository;
 
     /**
      * Constructor para la inyección de repositorios.
@@ -40,7 +40,7 @@ public class UserController {
      * @param userRepository Repositorio JPA de {@link User}.
      * @param storeRepository Repositorio JPA de {@link Store}.
      */
-    public UserController(UserRepository userRepository, StoreRepository storeRepository) {
+    public UserController(UserRepository userRepository, BranchRepository storeRepository) {
         this.userRepository = userRepository;
         this.storeRepository = storeRepository;
     }

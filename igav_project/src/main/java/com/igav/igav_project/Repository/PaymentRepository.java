@@ -1,7 +1,8 @@
 package com.igav.igav_project.Repository;
 
-import com.igav.igav_project.Model.Entity.Payment.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.igav.igav_project.Model.Entity.Commerce.Payment.Payment;
 
 import java.util.List;
 

@@ -13,14 +13,14 @@ import java.math.BigDecimal;
 @Component
 public class DataLoader implements CommandLineRunner {
 
-    private final StoreRepository storeRepository;
+    private final BranchRepository storeRepository;
     private final CategoryRepository categoryRepository;
     private final GarmentRepository garmentRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
 
     public DataLoader(
-            StoreRepository storeRepository,
+            BranchRepository storeRepository,
             CategoryRepository categoryRepository,
             GarmentRepository garmentRepository,
             CustomerRepository customerRepository,

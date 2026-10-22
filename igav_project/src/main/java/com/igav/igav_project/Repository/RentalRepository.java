@@ -1,7 +1,7 @@
 package com.igav.igav_project.Repository;
 
-import com.igav.igav_project.Model.Entity.Order.Order;
-import com.igav.igav_project.Model.Entity.Order.OrderStatus;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,7 +16,7 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     /**
      * Busca un contrato por su código único correlativo.
@@ -24,7 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param codigoContrato Código correlativo.
      * @return Optional con la orden.
      */
-    Optional<Order> findByCodigoContrato(String codigoContrato);
+    Optional<Rental> findByCodigoContrato(String codigoContrato);
 
     /**
      * Obtiene los contratos de una tienda específica (Aislamiento por Tenant, RF-01).
@@ -32,7 +32,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param storeId ID de la tienda.
      * @return Lista de contratos.
      */
-    List<Order> findByStoreId(Long storeId);
+    List<Rental> findByBranchId(Long branchId);
 
     /**
      * Consulta para detectar solapamiento o cruce de fechas en la reserva de una prenda específica (RF-04).
@@ -44,7 +44,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param estadosIgnorados Estados cancelados o borrador que no bloquean inventario.
      * @return true si existe colisión de fechas.
      */
-    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.items item " +
+    @Query("SELECT COUNT(o) > 0 FROM Rental o JOIN o.items item " +
            "WHERE item.garment.id = :garmentId " +
            "AND o.estado NOT IN :estadosIgnorados " +
            "AND (o.fechaEntregaAcordada < :fechaDevolucion AND o.fechaDevolucionAcordada > :fechaEntrega)")
@@ -52,7 +52,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("garmentId") Long garmentId,
             @Param("fechaEntrega") LocalDateTime fechaEntrega,
             @Param("fechaDevolucion") LocalDateTime fechaDevolucion,
-            @Param("estadosIgnorados") List<OrderStatus> estadosIgnorados
+            @Param("estadosIgnorados") List<RentalStatus> estadosIgnorados
     );
 }
 

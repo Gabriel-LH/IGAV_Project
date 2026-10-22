@@ -60,7 +60,7 @@ public class Branch {
     @Column (name = "is_primary", nullable = false)
     private boolean isPrimary;
     @Column (name = "status", nullable = false)
-    private StatusBranch status;
+    private BranchStatus status;
 
     @Column (name = "audit_metadata", nullable = false)
     private AuditMetadata auditMetadata;
@@ -119,7 +119,7 @@ public class Branch {
 
 
     public Branch(Long id, Tenant tenant, String code, String name, Address address, Telefono telefono, Email email,
-            String timezone, boolean isPrimary, StatusBranch status, AuditMetadata auditMetadata) {
+            String timezone, boolean isPrimary, BranchStatus status, AuditMetadata auditMetadata) {
         this.id = id;
         this.tenant = tenant;
         this.code = code;
@@ -213,11 +213,11 @@ public class Branch {
         this.isPrimary = isPrimary;
     }
 
-    public StatusBranch getStatus() {
+    public BranchStatus getStatus() {
         return status;
     }
 
-    public void setStatus(StatusBranch status) {
+    public void setStatus(BranchStatus status) {
         this.status = status;
     }
 

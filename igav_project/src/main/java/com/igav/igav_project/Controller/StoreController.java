@@ -7,7 +7,7 @@ import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
 import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 import com.igav.igav_project.Model.Shared.ValueObjects.TipoDocumento;
-import com.igav.igav_project.Repository.StoreRepository;
+import com.igav.igav_project.Repository.BranchRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -28,14 +28,14 @@ import java.util.List;
 @Tag(name = "Gestión de Tiendas (Multi-tenant)", description = "Endpoints para administración de sedes y tiendas (RF-01)")
 public class StoreController {
 
-    private final StoreRepository storeRepository;
+    private final BranchRepository storeRepository;
 
     /**
      * Constructor para la inyección del repositorio de tiendas.
      *
      * @param storeRepository Repositorio JPA de {@link Store}.
      */
-    public StoreController(StoreRepository storeRepository) {
+    public StoreController(BranchRepository storeRepository) {
         this.storeRepository = storeRepository;
     }
 

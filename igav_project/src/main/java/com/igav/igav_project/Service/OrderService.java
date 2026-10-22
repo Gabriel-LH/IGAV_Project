@@ -36,8 +36,8 @@ import java.util.UUID;
 @Service
 public class OrderService {
 
-    private final OrderRepository orderRepository;
-    private final StoreRepository storeRepository;
+    private final RentalRepository orderRepository;
+    private final BranchRepository storeRepository;
     private final CustomerRepository customerRepository;
     private final GarmentRepository garmentRepository;
     private final MaintenanceRecordRepository maintenanceRecordRepository;
@@ -46,8 +46,8 @@ public class OrderService {
     private final DomainEventPublisher eventPublisher;
 
     public OrderService(
-            OrderRepository orderRepository,
-            StoreRepository storeRepository,
+            RentalRepository orderRepository,
+            BranchRepository storeRepository,
             CustomerRepository customerRepository,
             GarmentRepository garmentRepository,
             MaintenanceRecordRepository maintenanceRecordRepository,

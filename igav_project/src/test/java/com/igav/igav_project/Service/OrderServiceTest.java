@@ -46,9 +46,9 @@ import static org.mockito.Mockito.*;
 class OrderServiceTest {
 
     @Mock
-    private OrderRepository orderRepository;
+    private RentalRepository orderRepository;
     @Mock
-    private StoreRepository storeRepository;
+    private BranchRepository storeRepository;
     @Mock
     private CustomerRepository customerRepository;
     @Mock

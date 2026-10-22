@@ -1,8 +1,10 @@
 package com.igav.igav_project.Repository;
 
-import com.igav.igav_project.Model.Entity.Store.Store;
-import com.igav.igav_project.Model.Entity.Store.StoreStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
+import com.igav.igav_project.Model.Entity.Organization.Branch.BranchStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +14,7 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-public interface StoreRepository extends JpaRepository<Store, Long> {
+public interface BranchRepository extends JpaRepository<Branch, Long> {
 
     /**
      * Busca una tienda por el número de RUC.
@@ -20,7 +22,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
      * @param rucNumero Número de RUC.
      * @return Optional con la tienda si existe.
      */
-    Optional<Store> findByRucNumero(String rucNumero);
+    Optional<Branch> findByRucNumero(String rucNumero);
 
     /**
      * Lista tiendas por estado de suscripción.
@@ -28,6 +30,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
      * @param status Estado de la tienda.
      * @return Lista de tiendas.
      */
-    List<Store> findByStatus(StoreStatus status);
+    List<Branch> findByStatus(BranchStatus status);
 }
 
