@@ -3,7 +3,7 @@ package com.igav.igav_project.Service;
 import com.igav.igav_project.Exception.ResourceNotFoundException;
 import com.igav.igav_project.Model.Entity.Inventory.Garment;
 import com.igav.igav_project.Model.Entity.Maintenance.MaintenanceRecord;
-import com.igav.igav_project.Repository.GarmentRepository;
+import com.igav.igav_project.Repository.InventoryRepository;
 import com.igav.igav_project.Repository.MaintenanceRecordRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MaintenanceService {
 
     private final MaintenanceRecordRepository maintenanceRecordRepository;
-    private final GarmentRepository garmentRepository;
+    private final InventoryRepository garmentRepository;
 
     public MaintenanceService(
             MaintenanceRecordRepository maintenanceRecordRepository,
-            GarmentRepository garmentRepository
+            InventoryRepository garmentRepository
     ) {
         this.maintenanceRecordRepository = maintenanceRecordRepository;
         this.garmentRepository = garmentRepository;

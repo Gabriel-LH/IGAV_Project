@@ -73,8 +73,8 @@ public class AuthController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             String roleName = user.getGlobalRole() != null ? user.getGlobalRole().name() : "VENDEDOR";
-            Long storeId = user.getStore() != null ? user.getStore().getId() : null;
-            String storeNombre = user.getStore() != null ? user.getStore().getNombreComercial() : "Sede Central";
+            Long branchId = user.getBranches() != null ? user.getBranches().getId() : null;
+            String storeNombre = user.getBranches() != null ? user.getBranches().getNombre() : "Sede Central";
             String fullName = (user.getNombres() != null ? user.getNombres() : "") + " " + (user.getApellidos() != null ? user.getApellidos() : "");
 
             String token = jwtTokenProvider.generateToken(

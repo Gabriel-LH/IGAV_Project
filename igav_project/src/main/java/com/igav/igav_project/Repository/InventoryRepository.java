@@ -1,7 +1,9 @@
 package com.igav.igav_project.Repository;
 
-import com.igav.igav_project.Model.Entity.Inventory.Garment;
-import com.igav.igav_project.Model.Entity.Inventory.GarmentStatus;
+import com.igav.igav_project.Model.Entity.Inventory.InventoryItem.InventoryItem;
+
+import com.igav.igav_project.Model.Entity.Organization.Branch.BranchStatus;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +16,7 @@ import java.util.Optional;
  *
  * @author IGAV Development Team
  */
-public interface GarmentRepository extends JpaRepository<Garment, Long> {
+public interface InventoryRepository extends JpaRepository<InventoryItem, Long> {
 
     /**
      * Busca una prenda por su código único de inventario SKU.
@@ -22,32 +24,32 @@ public interface GarmentRepository extends JpaRepository<Garment, Long> {
      * @param codigoUnico Código SKU.
      * @return Optional con la prenda.
      */
-    Optional<Garment> findByCodigoUnico(String codigoUnico);
+    Optional<InventoryItem> findByCodigoUnico(String codigoUnico);
 
     /**
      * Lista las prendas pertenecientes a una tienda específica (Aislamiento Multi-tenant, RF-01).
      *
-     * @param storeId ID de la tienda.
+     * @param branchId ID de la tienda.
      * @return Lista de prendas de la tienda.
      */
-    List<Garment> findByStoreId(Long storeId);
+    List<InventoryItem> findByBranchId(Long branchId);
 
     /**
      * Lista prendas por tienda y estado específico (RF-11).
      *
-     * @param storeId ID de la tienda.
+     * @param branchId ID de la tienda.
      * @param estado Estado de la prenda.
      * @return Lista de prendas.
      */
-    List<Garment> findByStoreIdAndEstado(Long storeId, GarmentStatus estado);
+    List<InventoryItem> findByStoreIdAndEstado(Long branchId, BranchStatus estado);
 
     /**
      * Consulta prendas que han superado o alcanzado el umbral de alerta por rotación de usos (RF-12).
      *
-     * @param storeId ID de la tienda.
+     * @param branchId ID de la tienda.
      * @return Lista de prendas en riesgo de desgaste elevado.
      */
-    @Query("SELECT g FROM Garment g WHERE g.store.id = :storeId AND g.usosAcumulados >= g.maxUsosRecomendados")
-    List<Garment> findGarmentsExceedingMaxUses(@Param("storeId") Long storeId);
+    @Query("SELECT g FROM InventryItem g WHERE g.branch.id = :branchId AND g.inventory_condition.Obsoleto")
+    List<InventoryItem> findGarmentsExceedingMaxUses(@Param("storeId") Long storeId);
 }
 

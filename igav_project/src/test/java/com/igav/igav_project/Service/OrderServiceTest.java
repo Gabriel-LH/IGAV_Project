@@ -52,7 +52,7 @@ class OrderServiceTest {
     @Mock
     private CustomerRepository customerRepository;
     @Mock
-    private GarmentRepository garmentRepository;
+    private InventoryRepository garmentRepository;
     @Mock
     private MaintenanceRecordRepository maintenanceRecordRepository;
     @Mock

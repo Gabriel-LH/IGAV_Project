@@ -39,7 +39,7 @@ public class OrderService {
     private final RentalRepository orderRepository;
     private final BranchRepository storeRepository;
     private final CustomerRepository customerRepository;
-    private final GarmentRepository garmentRepository;
+    private final InventoryRepository garmentRepository;
     private final MaintenanceRecordRepository maintenanceRecordRepository;
     private final ReturnIncidentRepository returnIncidentRepository;
     private final GarmentStatusHistoryRepository garmentStatusHistoryRepository;
@@ -49,7 +49,7 @@ public class OrderService {
             RentalRepository orderRepository,
             BranchRepository storeRepository,
             CustomerRepository customerRepository,
-            GarmentRepository garmentRepository,
+            InventoryRepository garmentRepository,
             MaintenanceRecordRepository maintenanceRecordRepository,
             ReturnIncidentRepository returnIncidentRepository,
             GarmentStatusHistoryRepository garmentStatusHistoryRepository,

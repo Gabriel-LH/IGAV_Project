@@ -15,14 +15,14 @@ public class DataLoader implements CommandLineRunner {
 
     private final BranchRepository storeRepository;
     private final CategoryRepository categoryRepository;
-    private final GarmentRepository garmentRepository;
+    private final InventoryRepository garmentRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
 
     public DataLoader(
             BranchRepository storeRepository,
             CategoryRepository categoryRepository,
-            GarmentRepository garmentRepository,
+            InventoryRepository garmentRepository,
             CustomerRepository customerRepository,
             UserRepository userRepository
     ) {
