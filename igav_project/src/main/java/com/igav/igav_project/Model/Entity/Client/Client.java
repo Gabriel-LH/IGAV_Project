@@ -28,9 +28,19 @@ public class Client {
     @Column (name = "tenant_id", nullable = false, length = 50)
     public String TenantId;
     
-    @Column (name = "document_id", nullable = false, length = 50)
+    @Embedded
+    @AttributeOverrides({
+      @AttributeOverride(name = "numero", column = @Column(name = "document_id", nullable = false, length = 50)),
+      @AttributeOverride(name = "tipo", column = @Column(name = "document_type", nullable = false, length = 50))
+    })
     public DocumentoIdentidad DocumentoIdentidad;
-    @Column (name = "name", nullable = false, length = 100) 
+    @Embedded
+    @AttributeOverrides({
+      @AttributeOverride(name = "tipo", column = @Column(name = "person_type", nullable = false, length = 50)),
+      @AttributeOverride(name = "nombres", column = @Column(name = "first_names", length = 100)),
+      @AttributeOverride(name = "apellidos", column = @Column(name = "last_names", length = 100)),
+      @AttributeOverride(name = "razonSocial", column = @Column(name = "business_name", length = 150))
+    })
     public NombrePersona NombrePersona;
     @Column (name = "email", nullable = false, length = 100)
     public String Email;

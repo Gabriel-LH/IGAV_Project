@@ -5,12 +5,14 @@ package com.igav.igav_project.DTO;
  *
  * @author IGAV Development Team
  */
-public record CreateStoreDTO(
-    String nombreComercial,
-    String razonSocial,
-    String ruc,
+public record CreateBranchDTO(
+    Long tenantId,
+    String code,
+    String name,
+    String timezone,
     String email,
     String telefono,
     String direccion,
-    String ciudad
+    String ciudad,
+    boolean primary
 ) {}

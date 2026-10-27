@@ -1,6 +1,5 @@
 package com.igav.igav_project.Model.Entity.Organization.Tenant;
 
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,15 +19,15 @@ import com.igav.igav_project.Model.Entity.Inventory.ProductVariantStock.ProductV
 import com.igav.igav_project.Model.Entity.Inventory.StockAdjustment.StockAdjustment;
 import com.igav.igav_project.Model.Entity.Inventory.Transfer.Transfer;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
-import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.Plan;
+import com.igav.igav_project.Model.Entity.Organization.Subscription.Module.Module;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantModule.TenantModule;
 import com.igav.igav_project.Model.Entity.Organization.Subscription.TenantSubscription.TenantSubscription;
 import com.igav.igav_project.Model.Entity.RecursosHumanos.Employee.Employee;
 import com.igav.igav_project.Model.Entity.RecursosHumanos.MemberShip.UserTenantMemberShip;
+import com.igav.igav_project.Model.Entity.RecursosHumanos.Role.Permission;
 import com.igav.igav_project.Model.Entity.RecursosHumanos.Role.Role;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
-import com.nimbusds.jose.shaded.gson.JsonObject;
 
 import jakarta.persistence.*;
 
@@ -56,17 +55,15 @@ public class Tenant {
     @Column (name = "owner_id", nullable = false, length = 100)
     public String OwnerId;
     @Column (name = "metadata", nullable = true, columnDefinition = "TEXT")
-    public JsonObject Metadata = new JsonObject();
+    public String Metadata = "{}";
     @Column (name = "tenant_config", nullable = true, columnDefinition = "TEXT")
-    public JsonObject TenantConfig = new JsonObject();
+    public String TenantConfig = "{}";
     @Embedded
     public AuditMetadata AuditMetadata; // O dividir en strings
     @Enumerated(EnumType.STRING)
     @Column (name = "tenant_status", nullable = false, length = 50)
     public TenantStatus TenantStatus;
 
-    @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Plan> plans = new ArrayList<>();
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Module> modules;
     @OneToMany (mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -118,7 +115,7 @@ public class Tenant {
 
 
 
-    public Tenant(String nombre, String slug, String ownerId, JsonObject metadata, JsonObject tenantConfig,
+    public Tenant(String nombre, String slug, String ownerId, String metadata, String tenantConfig,
             AuditMetadata auditMetadata, TenantStatus tenantStatus) {
         Nombre = nombre;
         Slug = slug;
@@ -141,10 +138,10 @@ public class Tenant {
     public String getOwnerId() {
         return OwnerId;
     }
-    public JsonObject getMetadata() {
+    public String getMetadata() {
         return Metadata;
     }
-    public JsonObject getTenantConfig() {
+    public String getTenantConfig() {
         return TenantConfig;
     }
     public AuditMetadata getAuditMetadata() {

@@ -87,13 +87,13 @@ public class Branch {
     @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Payment> payments = new ArrayList<>();
-    @OneToMany (mappedBy = "brach", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<CashSession> cashSessions = new ArrayList<>();
-    @OneToMany (mappedBy = "brach", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<InventoryMovement> inventoryMovements = new ArrayList<>();
-    @OneToMany (mappedBy = "brach", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductVariantStock> productVariantStocks = new ArrayList<>();
     @OneToMany (mappedBy = "sourceBranch", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -108,10 +108,10 @@ public class Branch {
     @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<TransferRoute> incomeRoute  = new ArrayList<>();
-    @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<StockAdjustment> stockAdjustments  = new ArrayList<>();
-    @OneToMany (mappedBy = "destinationBranch", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "defaultBranch", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<UserTenantMemberShip> userTenantMemberShips = new ArrayList<>();
     

@@ -1,6 +1,12 @@
 package com.igav.igav_project.Model.Shared.ValueObjects;
 
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
+@Embeddable
 public record NombrePersona(
+    @Enumerated(EnumType.STRING)
     TipoPersona tipo,
     String nombres,
     String apellidos,

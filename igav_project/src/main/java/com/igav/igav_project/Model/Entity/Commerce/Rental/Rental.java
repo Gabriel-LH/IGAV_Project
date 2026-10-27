@@ -14,9 +14,15 @@ import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Model.Shared.ValueObjects.Moneda;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity 
 @Table(name = "rentals")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Rental {
 
     @Id 
@@ -25,7 +31,7 @@ public class Rental {
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name="tenant_id", nullable = false)
-    private Tenant tenanId;
+    private Tenant tenant;
 
     // Cada alquiler específico pertenece a UNA sola Operación
     @ManyToOne (fetch = FetchType.LAZY)
@@ -61,20 +67,18 @@ public class Rental {
     private RentalStatus status;
 
     
-    @ManyToOne (fetch = FetchType.LAZY)
-    @Column(name = "guarantee_id", nullable = true)
-    private Guarantee guarantee;
-
     // Si Moneda es una clase mapeada como Embeddable o tipo numérico (BigDecimal):
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "amount", column = @Column(name = "sub_total"))
+        @AttributeOverride(name = "monto", column = @Column(name = "sub_total")),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "sub_total_currency", length = 3))
     })
     private Moneda subTotal;
 
     @Embedded
     @AttributeOverrides({
-        @AttributeOverride(name = "amount", column = @Column(name = "total_discount"))
+        @AttributeOverride(name = "monto", column = @Column(name = "total_discount")),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "discount_currency", length = 3))
     })
     private Moneda totalDiscount;
 
@@ -89,8 +93,10 @@ public class Rental {
 
     // Un alquiler tiene MUCHAS garantías
     @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Guarantee> guarantees = new ArrayList<>();
     @OneToMany(mappedBy = "rental", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<RentalItem> rentalItems = new ArrayList<>();
 
 

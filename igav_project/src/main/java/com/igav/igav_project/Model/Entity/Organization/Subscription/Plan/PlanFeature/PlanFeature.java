@@ -21,9 +21,8 @@ public class PlanFeature {
     @JoinColumn (name = "plan_id", nullable = false)
     private Plan Plan;
     
-    @CollectionTable (name = "plan_feature_keys", joinColumns = @JoinColumn(name = "plan_feature_id"))
-    @ElementCollection
-    @Embedded
+    @Enumerated(EnumType.STRING)
+    @Column(name = "plan_feature_key", nullable = false, length = 100)
     private PlanFeatureKey PlanFeatureKey;
     
     public PlanFeature() {

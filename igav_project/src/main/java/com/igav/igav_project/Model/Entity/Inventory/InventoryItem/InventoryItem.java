@@ -1,6 +1,7 @@
 package com.igav.igav_project.Model.Entity.Inventory.InventoryItem;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,8 @@ public class InventoryItem {
     private int usageCount;
     @Column (name = "last_maintance", nullable = false)
     private LocalDate lastMaintance;
+    @Column(name = "available_at")
+    private LocalDateTime availableAt;
     
     @Enumerated (EnumType.STRING)
     @Column (name = "inventory_condition", nullable = false)
@@ -61,10 +64,10 @@ public class InventoryItem {
     @Column (name = "inventory_status", nullable = false)
     private InventoryStatus inventoryStatus;
 
-    @OneToMany (mappedBy = "inventory_item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "inventoryItem", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RentalItem> rentalItems = new ArrayList<>();
-    @OneToMany (mappedBy = "inventory_item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "inventoryItem", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SaleItem> saleItems = new ArrayList<>();
 }   

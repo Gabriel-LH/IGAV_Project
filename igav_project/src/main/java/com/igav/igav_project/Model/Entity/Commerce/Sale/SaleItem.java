@@ -23,6 +23,10 @@ import lombok.*;
 @Builder 
 public class SaleItem {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "tenant_id", nullable = false)
     private Long tenantId;
 
@@ -39,7 +43,7 @@ public class SaleItem {
     private StockLot stockLot;
 
     @ManyToOne (fetch = FetchType.LAZY)
-    @Column(name = "variant_id", nullable = false)
+    @JoinColumn(name = "variant_id", nullable = false)
     private ProductVariant variant;
 
     @ManyToOne (fetch = FetchType.LAZY)

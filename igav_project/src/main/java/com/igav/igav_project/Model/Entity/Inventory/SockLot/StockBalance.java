@@ -3,10 +3,15 @@ package com.igav.igav_project.Model.Entity.Inventory.SockLot;
 
 import com.igav.igav_project.Model.Shared.ValueObjects.Moneda;
 import java.math.RoundingMode;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 
+@Embeddable
 public record StockBalance(
     int quantity,
+    @Embedded
     Moneda averageCost,
+    @Embedded
     Moneda totalValue
 ) {
 

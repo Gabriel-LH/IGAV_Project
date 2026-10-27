@@ -17,11 +17,19 @@ import lombok.*;
 @Builder 
 public class RentalCharge {
 
-    @Column(name = "tenant_id", insertable = false, updatable = false, nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "tenant_id", nullable = false)
     private Long tenantId;
 
     @Column(name = "rental_id", insertable = false, updatable = false, nullable = false)
     private Long rentalId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rental_id", nullable = false)
+    private Rental rental;
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_item_id", nullable = false)

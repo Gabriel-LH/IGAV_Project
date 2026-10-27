@@ -23,6 +23,10 @@ import lombok.*;
 @Builder 
 public class RentalItem {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "tenant_id", nullable = false)
     private Long tenantId;
 
@@ -39,7 +43,7 @@ public class RentalItem {
     private Product product;
 
     @ManyToOne  (fetch = FetchType.LAZY)
-    @Column(name = "variant_id", nullable = false)
+    @JoinColumn(name = "variant_id", nullable = false)
     private ProductVariant productVariant;
     
     @ManyToOne (fetch = FetchType.LAZY)
@@ -105,7 +109,10 @@ public class RentalItem {
     @Embedded
     private AuditMetadata auditMetadata;
 
-    @OneToMany (mappedBy = "rental_item", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "rentalItem", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RentalCharge> rentalCharges = new ArrayList<>();
+
+    @OneToOne(mappedBy = "rentalItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RentalReturnInspection returnInspection;
 }

@@ -7,9 +7,15 @@ import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table (name = "guaranties")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Guarantee {
 
 
@@ -19,7 +25,7 @@ public class Guarantee {
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name="tenant_id", nullable = false)
-    private Tenant tenanId;
+    private Tenant tenant;
 
     // Cada alquiler específico pertenece a UNA sola Operación
     @ManyToOne (fetch = FetchType.LAZY)

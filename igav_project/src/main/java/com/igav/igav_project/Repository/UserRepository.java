@@ -22,11 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailEmail(String email);
 
     /**
-     * Obtiene los usuarios pertenecientes a una tienda específica (Aislamiento por Tenant, RF-01).
+    * Obtiene los usuarios asignados a una sucursal (RF-02).
      *
-     * @param storeId ID de la tienda.
-     * @return Lista de usuarios de la tienda.
+     * @param branchId ID de la sucursal.
+     * @return Lista de usuarios asignados a la sucursal.
      */
-    List<User> findByStoreId(Long storeId);
+    List<User> findByBranchesId(Long branchId);
 }
 

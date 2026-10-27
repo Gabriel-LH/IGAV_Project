@@ -10,7 +10,6 @@ import com.igav.igav_project.Model.Shared.ValueObjects.Email;
 import com.igav.igav_project.Model.Shared.ValueObjects.Genero;
 import com.igav.igav_project.Model.Shared.ValueObjects.NombrePersona;
 import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
-import com.igav.igav_project.Model.Shared.ValueObjects.TipoDocumento;
 import com.igav.igav_project.Model.Shared.ValueObjects.TipoPersona;
 
 import jakarta.persistence.*;
@@ -25,16 +24,17 @@ import lombok.*;
 @Builder 
 public class Employee {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_documento", nullable = false)
-    private TipoDocumento tipoDocumento;
-
     @Embedded
     @AttributeOverrides({
+        @AttributeOverride(name = "tipo", column = @Column(name = "tipo_documento", nullable = false)),
         @AttributeOverride(name = "numero", column = @Column(name = "numero_documento", length = 20, nullable = false))
     })
     private DocumentoIdentidad documentoIdentidad;

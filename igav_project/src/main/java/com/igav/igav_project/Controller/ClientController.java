@@ -1,15 +1,17 @@
 package com.igav.igav_project.Controller;
 
-import com.igav.igav_project.DTO.CreateCustomerDTO;
-import com.igav.igav_project.Model.Entity.Order.Customer;
-import com.igav.igav_project.Model.Entity.Store.Store;
+import com.igav.igav_project.DTO.CreateClientDTO;
+import com.igav.igav_project.Model.Entity.Client.Client;
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Shared.ValueObjects.Address;
 import com.igav.igav_project.Model.Shared.ValueObjects.DocumentoIdentidad;
-import com.igav.igav_project.Model.Shared.ValueObjects.Email;
-import com.igav.igav_project.Model.Shared.ValueObjects.Telefono;
 import com.igav.igav_project.Model.Shared.ValueObjects.TipoDocumento;
-import com.igav.igav_project.Repository.CustomerRepository;
+import com.igav.igav_project.Model.Shared.ValueObjects.NombrePersona;
+import com.igav.igav_project.Model.Entity.Client.ClientStatus;
+import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Repository.BranchRepository;
+import com.igav.igav_project.Repository.ClientRepository;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -28,20 +30,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/customers")
 @Tag(name = "Gestión de Clientes", description = "Endpoints para consulta y registro de clientes finales (RF-06)")
-public class CustomerController {
+public class ClientController {
 
-    private final CustomerRepository customerRepository;
-    private final BranchRepository storeRepository;
+    private final ClientRepository clientRepository;
+    private final BranchRepository branchRepository;
 
     /**
      * Constructor con inyección de dependencias para los repositorios.
      *
-     * @param customerRepository Repositorio JPA de {@link Customer}.
-     * @param storeRepository Repositorio JPA de {@link Store}.
+     * @param clientRepository Repositorio JPA de {@link Client}.
+     * @param branchRepository Repositorio JPA de {@link Branch}.
      */
-    public CustomerController(CustomerRepository customerRepository, BranchRepository storeRepository) {
-        this.customerRepository = customerRepository;
-        this.storeRepository = storeRepository;
+    public ClientController(ClientRepository clientRepository, BranchRepository branchRepository) {
+        this.clientRepository = clientRepository;
+        this.branchRepository = branchRepository;
     }
 
     /**
@@ -51,8 +53,8 @@ public class CustomerController {
      */
     @GetMapping
     @Operation(summary = "Listar todos los clientes", description = "Obtiene el directorio completo de clientes registrados en el sistema")
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        return ResponseEntity.ok(customerRepository.findAll());
+    public ResponseEntity<List<Client>> getAllCustomers() {
+        return ResponseEntity.ok(clientRepository.findAll());
     }
 
     /**
@@ -61,10 +63,14 @@ public class CustomerController {
      * @param storeId Identificador numérico de la tienda.
      * @return Lista de clientes de la tienda especificada.
      */
-    @GetMapping("/store/{storeId}")
+    @GetMapping("/branch/{branchId}")
     @Operation(summary = "Listar clientes por tienda", description = "Obtiene los clientes pertenecientes a la tienda indicada")
-    public ResponseEntity<List<Customer>> getCustomersByStore(@PathVariable Long storeId) {
-        return ResponseEntity.ok(customerRepository.findByStoreId(storeId));
+    @SuppressWarnings("null")
+    public ResponseEntity<List<Client>> getCustomersByStore(@PathVariable Long branchId) {
+        Branch branch = branchRepository.findById(branchId)
+            .orElseThrow(() -> new com.igav.igav_project.Exception.ResourceNotFoundException(
+                "Sucursal no encontrada con ID: " + branchId));
+        return ResponseEntity.ok(clientRepository.findByTenantId(branch.getTenant().getId().toString()));
     }
 
     /**
@@ -75,7 +81,8 @@ public class CustomerController {
      */
     @PostMapping
     @Operation(summary = "Registrar nuevo cliente", description = "Persiste un nuevo cliente en la BD MySQL con validación de identidad (RF-06)")
-    public ResponseEntity<Customer> createCustomer(@RequestBody CreateCustomerDTO request) {
+    @SuppressWarnings("null")
+    public ResponseEntity<Client> createCustomer(@RequestBody CreateClientDTO request) {
         String nombres = request.nombres();
         String apellidos = request.apellidos();
         if (apellidos == null || apellidos.isBlank()) {
@@ -95,16 +102,21 @@ public class CustomerController {
             } catch (Exception ignored) {}
         }
 
-        String docNum = (request.numeroDocumento() != null && !request.numeroDocumento().isBlank())
-            ? request.numeroDocumento()
-            : String.format("%08d", (int)(Math.random() * 90000000) + 10000000);
-
-        Store store = null;
-        if (request.storeId() != null) {
-            store = storeRepository.findById(request.storeId()).orElse(null);
+        if (request.numeroDocumento() == null || request.numeroDocumento().isBlank()) {
+            throw new IllegalArgumentException("El número de documento es obligatorio.");
         }
-        if (store == null) {
-            store = storeRepository.findAll().stream().findFirst().orElse(null);
+
+        Long branchId = request.branchId();
+        if (branchId == null) {
+            throw new IllegalArgumentException("El ID de sucursal es obligatorio.");
+        }
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new com.igav.igav_project.Exception.ResourceNotFoundException(
+                        "Sucursal no encontrada con ID: " + branchId));
+        String tenantId = branch.getTenant().getId().toString();
+        if (clientRepository.findByDocumentoIdentidadNumeroAndTenantId(
+                request.numeroDocumento(), tenantId).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un cliente con ese documento en el tenant.");
         }
 
         String telStr = request.telefono() != null ? request.telefono().replaceAll("[\\s\\-\\(\\)]", "") : "+51999888777";
@@ -112,21 +124,25 @@ public class CustomerController {
             telStr = "+51999888777";
         }
 
-        Customer customer = Customer.create(
-            nombres != null ? nombres : "Cliente",
-            apellidos,
-            new DocumentoIdentidad(docTipo, docNum),
-            new Email(request.email() != null && !request.email().isBlank() ? request.email() : "cliente@gala.pe"),
-            new Telefono(telStr),
+        Client client = Client.create(
+            tenantId,
+            new DocumentoIdentidad(docTipo, request.numeroDocumento()),
+            NombrePersona.natural(nombres != null ? nombres : "Cliente", apellidos),
+            request.email() != null && !request.email().isBlank() ? request.email() : "cliente@gala.pe",
+            telStr,
+            ClientStatus.ACTIVE,
+            null,
+            null,
             new Address(
                 request.direccion() != null ? request.direccion() : "San Isidro",
                 "San Isidro", "Lima", "Perú", "15073", "Domicilio", "15073"
             ),
-            store,
-            "SYSTEM"
+            null,
+            "{}",
+            AuditMetadata.create("SYSTEM")
         );
 
-        Customer saved = customerRepository.save(customer);
+        Client saved = clientRepository.save(client);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 }

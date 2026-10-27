@@ -22,13 +22,19 @@ public class Plan {
     private String name;
     @Column(name = "description", length = 255)
     private String description;
-    @Column(name = "monthly_price", nullable = false)
-    @Embedded 
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "monthly_price", nullable = false)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "monthly_price_currency", length = 3, nullable = false))
+    })
     private Moneda PrecioMensual;
     @Column(name = "trial_days", nullable = false)
     public int diasDePrueba;
-    @Column(name = "annual_price", nullable = false)
-    @Embedded 
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "annual_price", nullable = false)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "annual_price_currency", length = 3, nullable = false))
+    })
     private Moneda precioAnual;
     @Column(name = "is_active", nullable = false)
     private boolean isActive;

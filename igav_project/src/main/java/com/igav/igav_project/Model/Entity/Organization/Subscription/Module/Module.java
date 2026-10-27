@@ -14,7 +14,7 @@ public class Module {
     
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name = "tenant_id", nullable = false)
-    private Tenant Tenant;
+    private Tenant tenant;
     @Column (name = "nombre", nullable = false, length = 100)
     private String nombre;
     @Column (name = "slug", nullable = false, length = 100)

@@ -52,14 +52,14 @@ public class StockMovement {
     @Embedded
     @AttributeOverrides({
         @AttributeOverride(name = "monto", column = @Column(name = "unit_cost_monto", precision = 12, scale = 4, nullable = false)),
-        @AttributeOverride(name = "tipoMoneda", column = @Column(name = "unit_cost_moneda", length = 3, nullable = false))
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "unit_cost_moneda", length = 3, nullable = false))
     })
     private Moneda unitCost;
 
     @Embedded
     @AttributeOverrides({
         @AttributeOverride(name = "monto", column = @Column(name = "total_cost_monto", precision = 12, scale = 2, nullable = false)),
-        @AttributeOverride(name = "tipoMoneda", column = @Column(name = "total_cost_moneda", length = 3, nullable = false))
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "total_cost_moneda", length = 3, nullable = false))
     })
     private Moneda totalCost;
 
@@ -69,7 +69,7 @@ public class StockMovement {
     @Embedded
     @AttributeOverrides({
         @AttributeOverride(name = "monto", column = @Column(name = "running_unit_cost_monto", precision = 12, scale = 4, nullable = false)),
-        @AttributeOverride(name = "tipoMoneda", column = @Column(name = "running_unit_cost_moneda", length = 3, nullable = false))
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "running_unit_cost_moneda", length = 3, nullable = false))
     })
     private Moneda runningUnitCost;
 

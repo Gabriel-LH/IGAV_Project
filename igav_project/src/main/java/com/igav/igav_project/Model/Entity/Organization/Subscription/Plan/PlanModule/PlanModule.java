@@ -1,8 +1,5 @@
 package com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.PlanModule;
 
-import java.util.Dictionary;
-import java.util.List;
-
 import com.igav.igav_project.Model.Entity.Organization.Subscription.Plan.Plan;
 
 import jakarta.persistence.*;
@@ -20,12 +17,12 @@ public class PlanModule {
     private Plan Plan;
 
     @Column (name = "modules_by_section", nullable = false, columnDefinition = "TEXT")
-    private Dictionary<String, List<PlanModuleKey>> ModulesBySection;
+    private String ModulesBySection;
 
     public PlanModule() {
     }
 
-    public PlanModule(Long id, Plan plan, Dictionary<String, List<PlanModuleKey>> modulesBySection) {
+    public PlanModule(Long id, Plan plan, String modulesBySection) {
         this.id = id;
         Plan = plan;
         ModulesBySection = modulesBySection;
@@ -47,11 +44,11 @@ public class PlanModule {
         Plan = plan;
     }
 
-    public Dictionary<String, List<PlanModuleKey>> getModulesBySection() {
+    public String getModulesBySection() {
         return ModulesBySection;
     }
 
-    public void setModulesBySection(Dictionary<String, List<PlanModuleKey>> modulesBySection) {
+    public void setModulesBySection(String modulesBySection) {
         ModulesBySection = modulesBySection;
     }
 

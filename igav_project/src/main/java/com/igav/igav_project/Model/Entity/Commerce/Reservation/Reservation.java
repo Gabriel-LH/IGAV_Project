@@ -10,7 +10,7 @@ import com.igav.igav_project.Model.Entity.Commerce.Sale.Sale;
 import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
-import com.nimbusds.openid.connect.sdk.federation.api.OperationType;
+import com.igav.igav_project.Model.Entity.Commerce.Operation.OperationType;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,7 +30,7 @@ public class Reservation {
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn (name="tenant_id", nullable = false)
-    private Tenant tenanId;
+    private Tenant tenant;
 
     // Cada alquiler específico pertenece a UNA sola Operación
     @ManyToOne (fetch = FetchType.LAZY)
@@ -64,8 +64,7 @@ public class Reservation {
     @Column (name = "notes", nullable = false)
     private String notes;
 
-    @Embedded 
-    @Column (name = "audit_metadata", nullable = false)
+    @Embedded
     private AuditMetadata auditMetadata;
 
     @OneToMany (mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)

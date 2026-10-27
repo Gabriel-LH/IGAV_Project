@@ -2,6 +2,7 @@ package com.igav.igav_project.Controller;
 
 import com.igav.igav_project.DTO.AuthResponseDTO;
 import com.igav.igav_project.DTO.LoginRequestDTO;
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.User.GlobalRole;
 import com.igav.igav_project.Model.Entity.User.User;
 import com.igav.igav_project.Repository.UserRepository;
@@ -72,15 +73,18 @@ public class AuthController {
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            String roleName = user.getGlobalRole() != null ? user.getGlobalRole().name() : "VENDEDOR";
-            Long branchId = user.getBranches() != null ? user.getBranches().getId() : null;
-            String storeNombre = user.getBranches() != null ? user.getBranches().getNombre() : "Sede Central";
+                String roleName = user.getGlobalRole() != null ? user.getGlobalRole().name() : GlobalRole.USER.name();
+                Branch primaryBranch = user.getBranches() == null
+                    ? null
+                    : user.getBranches().stream().findFirst().orElse(null);
+                Long branchId = primaryBranch != null ? primaryBranch.getId() : null;
+                String branchName = primaryBranch != null ? primaryBranch.getName() : "Sin sucursal";
             String fullName = (user.getNombres() != null ? user.getNombres() : "") + " " + (user.getApellidos() != null ? user.getApellidos() : "");
 
             String token = jwtTokenProvider.generateToken(
                     user.getEmail().email(),
                     roleName,
-                    storeId,
+                    branchId,
                     fullName.trim()
             );
 
@@ -90,8 +94,8 @@ public class AuthController {
                     user.getEmail().email(),
                     fullName.trim(),
                     roleName,
-                    storeId,
-                    storeNombre,
+                    branchId,
+                    branchName,
                     86400000L
             );
 
@@ -100,13 +104,13 @@ public class AuthController {
 
         // Demo fallback si la BD o contraseña rápida es ingresada
         if (password.equals("admin123") || password.equals("gala2026") || password.equals("tintoreria2026") || password.equals("123456")) {
-            String role = GlobalRole.VENDEDOR.name();
+            String role = GlobalRole.USER.name();
             String name = "Gabriel Vendedor Senior";
             if (usernameOrEmail.toLowerCase().contains("admin")) {
                 role = GlobalRole.SUPER_ADMIN.name();
                 name = "Admin SaaS Root";
             } else if (usernameOrEmail.toLowerCase().contains("tintoreria") || usernameOrEmail.toLowerCase().contains("almacen") || usernameOrEmail.toLowerCase().contains("morales") || usernameOrEmail.toLowerCase().contains("patricia")) {
-                role = GlobalRole.ENCARGADO_ALMACEN_TINTORERIA.name();
+                role = GlobalRole.USER.name();
                 name = "Patricia Morales Prado";
             }
             String token = jwtTokenProvider.generateToken(usernameOrEmail, role, 1L, name);

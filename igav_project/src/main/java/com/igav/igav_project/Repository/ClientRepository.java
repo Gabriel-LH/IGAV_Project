@@ -15,13 +15,13 @@ import java.util.Optional;
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
     /**
-     * Busca un cliente por su documento de identidad y su tienda.
+    * Busca un cliente por su documento de identidad y tenant.
      *
      * @param numero Número de documento (DNI/RUC).
-     * @param tenantId ID de la tienda.
+    * @param tenantId ID del tenant como se almacena en Client.
      * @return Optional con el cliente.
      */
-    Optional<Client> findByDocumentoIdentidadNumeroAndTenantId(String numero, Long tenantId);
+    Optional<Client> findByDocumentoIdentidadNumeroAndTenantId(String numero, String tenantId);
 
     /**
      * Lista todos los clientes pertenecientes a una tienda.
@@ -29,6 +29,6 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
      * @param tenantId ID de la tienda.
      * @return Lista de clientes.
      */
-    List<Client> findByTenantId(Long tenantId);
+    List<Client> findByTenantId(String tenantId);
 }
 

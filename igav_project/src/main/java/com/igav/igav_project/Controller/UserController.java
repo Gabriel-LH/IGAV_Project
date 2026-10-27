@@ -1,7 +1,7 @@
 package com.igav.igav_project.Controller;
 
 import com.igav.igav_project.DTO.CreateUserDTO;
-import com.igav.igav_project.Model.Entity.Store.Store;
+import com.igav.igav_project.Model.Entity.Organization.Branch.Branch;
 import com.igav.igav_project.Model.Entity.User.GlobalRole;
 import com.igav.igav_project.Model.Entity.User.StatusUser;
 import com.igav.igav_project.Model.Entity.User.User;
@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador REST para la gestión y consulta de usuarios del sistema y asignación de roles (RF-02).
@@ -38,7 +39,7 @@ public class UserController {
      * Constructor para la inyección de repositorios.
      *
      * @param userRepository Repositorio JPA de {@link User}.
-     * @param storeRepository Repositorio JPA de {@link Store}.
+    * @param storeRepository Repositorio JPA de {@link Branch}.
      */
     public UserController(UserRepository userRepository, BranchRepository storeRepository) {
         this.userRepository = userRepository;
@@ -62,10 +63,10 @@ public class UserController {
      * @param storeId Identificador de la tienda.
      * @return Lista de usuarios asignados a la tienda.
      */
-    @GetMapping("/store/{storeId}")
-    @Operation(summary = "Listar usuarios por tienda", description = "Obtiene los usuarios pertenecientes a la tienda indicada")
-    public ResponseEntity<List<User>> getUsersByStore(@PathVariable Long storeId) {
-        return ResponseEntity.ok(userRepository.findByStoreId(storeId));
+    @GetMapping("/branch/{branchId}")
+    @Operation(summary = "Listar usuarios por sucursal", description = "Obtiene los usuarios asignados a la sucursal indicada")
+    public ResponseEntity<List<User>> getUsersByBranch(@PathVariable Long branchId) {
+        return ResponseEntity.ok(userRepository.findByBranchesId(branchId));
     }
 
     /**
@@ -76,6 +77,7 @@ public class UserController {
      */
     @PostMapping
     @Operation(summary = "Crear nuevo usuario de staff", description = "Persiste un nuevo usuario con rol de seguridad en la BD (RF-02)")
+    @SuppressWarnings("null")
     public ResponseEntity<User> createUser(@RequestBody CreateUserDTO request) {
         String nombres = request.nombres();
         String apellidos = request.apellidos();
@@ -89,30 +91,24 @@ public class UserController {
             }
         }
 
-        Store store = null;
-        if (request.storeId() != null) {
-            store = storeRepository.findById(request.storeId()).orElse(null);
-        }
-        if (store == null) {
-            store = storeRepository.findAll().stream().findFirst().orElse(null);
-        }
-
-        GlobalRole role = GlobalRole.VENDEDOR;
+        GlobalRole role = GlobalRole.USER;
         if (request.rol() != null) {
-            try {
-                if (request.rol().equals("ADMIN_SAAS")) {
-                    role = GlobalRole.SUPER_ADMIN;
-                } else if (request.rol().equals("ENCARGADO_TINTORERIA")) {
-                    role = GlobalRole.ENCARGADO_ALMACEN_TINTORERIA;
-                } else {
-                    role = GlobalRole.valueOf(request.rol());
-                }
-            } catch (Exception ignored) {}
+            role = request.rol().equals("ADMIN_SAAS") || request.rol().equals("SUPER_ADMIN")
+                    ? GlobalRole.SUPER_ADMIN
+                    : GlobalRole.USER;
         }
 
-        String docNum = (request.numeroDocumento() != null && !request.numeroDocumento().isBlank())
-            ? request.numeroDocumento()
-            : String.format("%08d", (int)(Math.random() * 90000000) + 10000000);
+        Branch branch = null;
+        if (request.storeId() != null) {
+            branch = storeRepository.findById(request.storeId())
+                    .orElseThrow(() -> new RuntimeException("Sucursal no encontrada con ID: " + request.storeId()));
+        } else if (role != GlobalRole.SUPER_ADMIN) {
+            throw new IllegalArgumentException("El ID de sucursal es obligatorio para usuarios de sucursal.");
+        }
+
+        if (request.numeroDocumento() == null || request.numeroDocumento().isBlank()) {
+            throw new IllegalArgumentException("El número de documento es obligatorio.");
+        }
 
         TipoDocumento docTipo = TipoDocumento.DNI;
         if (request.tipoDocumento() != null) {
@@ -130,14 +126,17 @@ public class UserController {
             nombres != null ? nombres : "Staff",
             apellidos,
             new Email(request.email() != null ? request.email() : "staff@igav.pe"),
-            new DocumentoIdentidad(docTipo, docNum),
+            new DocumentoIdentidad(docTipo, request.numeroDocumento()),
             "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200",
             new Telefono(telStr),
             role,
             new Address("Av. Conquistadores 780", "San Isidro", "Lima", "Perú", "15073", "Oficina", "15073"),
-            store,
             "SYSTEM"
         );
+
+        if (branch != null) {
+            user.setBranches(Set.of(branch));
+        }
 
         User saved = userRepository.save(user);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
@@ -151,6 +150,7 @@ public class UserController {
      */
     @PatchMapping("/{id}/toggle-status")
     @Operation(summary = "Cambiar estado de usuario", description = "Alterna el estado ACTIVO/INACTIVO del personal")
+    @SuppressWarnings("null")
     public ResponseEntity<User> toggleUserStatus(@PathVariable Long id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));

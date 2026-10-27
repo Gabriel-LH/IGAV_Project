@@ -2,6 +2,7 @@ package com.igav.igav_project.Model.Entity.Organization.Subscription.TenantModul
 
 import java.util.Date;
 
+import com.igav.igav_project.Model.Entity.Organization.Subscription.Module.Module;
 import com.igav.igav_project.Model.Entity.Organization.Tenant.Tenant;
 
 import jakarta.persistence.*;

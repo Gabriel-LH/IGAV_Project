@@ -23,7 +23,7 @@ public class ProductVariantStock {
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id", nullable = false)
-    private Tenant tenat;
+    private Tenant tenant;
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
@@ -36,7 +36,14 @@ public class ProductVariantStock {
     @JoinColumn(name = "variant_id", nullable = false)
     private ProductVariant productVariant;
 
-    @Column (name = "stock_balance", nullable = false)
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "quantity", column = @Column(name = "stock_quantity", nullable = false)),
+        @AttributeOverride(name = "averageCost.monto", column = @Column(name = "average_cost", precision = 12, scale = 2, nullable = false)),
+        @AttributeOverride(name = "averageCost.tipoMoneda.codigo", column = @Column(name = "average_cost_currency", length = 3, nullable = false)),
+        @AttributeOverride(name = "totalValue.monto", column = @Column(name = "total_value", precision = 12, scale = 2, nullable = false)),
+        @AttributeOverride(name = "totalValue.tipoMoneda.codigo", column = @Column(name = "total_value_currency", length = 3, nullable = false))
+    })
     private StockBalance stockBalance;
 
 }

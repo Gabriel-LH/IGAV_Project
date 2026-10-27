@@ -41,7 +41,7 @@ public class AttributeType {
     @Column (name = "is_active", nullable = true)
     private boolean isActive;
 
-    @OneToMany(mappedBy = "attributeType", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "attributeTypeId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<AttributeValue> values = new ArrayList<>();
 

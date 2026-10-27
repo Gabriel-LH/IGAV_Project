@@ -12,7 +12,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity 
-@Table (name = "inventory_items")
+@Table (name = "inventory_movements")
 @Getter 
 @Setter 
 @NoArgsConstructor 

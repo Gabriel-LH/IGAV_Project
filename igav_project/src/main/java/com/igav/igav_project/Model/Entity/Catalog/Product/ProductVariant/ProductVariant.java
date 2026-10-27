@@ -91,19 +91,19 @@ public class ProductVariant {
     @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RentalItem> renatlItems = new ArrayList<>();
-    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SaleItem> saleItems = new ArrayList<>();
-    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<InventoryMovement> inventoryMovements = new ArrayList<>();
     @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ProductVariantStock> productVariantStocks  = new ArrayList<>();
-    @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<TransferItem> transferItems  = new ArrayList<>();
-     @OneToMany (mappedBy = "productVariant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany (mappedBy = "variant", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<StockAdjustmentItem> stockAdjustmentItems  = new ArrayList<>();
 

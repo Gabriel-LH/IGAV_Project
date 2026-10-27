@@ -2,11 +2,15 @@ package com.igav.igav_project.Repository;
 
 import com.igav.igav_project.Model.Entity.Commerce.Rental.Rental;
 import com.igav.igav_project.Model.Entity.Commerce.Rental.RentalStatus;
+import com.igav.igav_project.Model.Entity.Commerce.Reservation.ReservationStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,13 +22,9 @@ import java.util.Optional;
  */
 public interface RentalRepository extends JpaRepository<Rental, Long> {
 
-    /**
-     * Busca un contrato por su código único correlativo.
-     *
-     * @param codigoContrato Código correlativo.
-     * @return Optional con la orden.
-     */
-    Optional<Rental> findByCodigoContrato(String codigoContrato);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT rental FROM Rental rental WHERE rental.id = :rentalId")
+    Optional<Rental> findByIdForUpdate(@Param("rentalId") Long rentalId);
 
     /**
      * Obtiene los contratos de una tienda específica (Aislamiento por Tenant, RF-01).
@@ -35,24 +35,40 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
     List<Rental> findByBranchId(Long branchId);
 
     /**
-     * Consulta para detectar solapamiento o cruce de fechas en la reserva de una prenda específica (RF-04).
-     * Retorna true si existe al menos una orden activa o confirmada para la prenda en el rango solicitado.
+    * Consulta para detectar solapamiento de alquileres de una prenda serializada.
      *
-     * @param garmentId ID de la prenda a validar.
-     * @param fechaEntrega Fecha estimada de retiro/entrega.
-     * @param fechaDevolucion Fecha estimada de retorno.
-     * @param estadosIgnorados Estados cancelados o borrador que no bloquean inventario.
+         * @param inventoryItemId ID de la unidad de inventario a validar.
+         * @param fechaEntrega Inicio solicitado.
+         * @param fechaDevolucion Fin solicitado.
+         * @param estadosBloqueantes Estados que ocupan la prenda.
      * @return true si existe colisión de fechas.
      */
-    @Query("SELECT COUNT(o) > 0 FROM Rental o JOIN o.items item " +
-           "WHERE item.garment.id = :garmentId " +
-           "AND o.estado NOT IN :estadosIgnorados " +
-           "AND (o.fechaEntregaAcordada < :fechaDevolucion AND o.fechaDevolucionAcordada > :fechaEntrega)")
-    boolean existsOverlappingReservation(
-            @Param("garmentId") Long garmentId,
+        @Query("SELECT COUNT(r) > 0 FROM Rental r JOIN r.rentalItems item " +
+            "WHERE item.inventoryItem.id = :inventoryItemId " +
+            "AND r.isDeleted = false " +
+            "AND r.status IN :estadosBloqueantes " +
+            "AND r.outDate < :fechaDevolucion " +
+            "AND r.expectedReturnDate > :fechaEntrega")
+        boolean existsOverlappingRental(
+             @Param("inventoryItemId") Long inventoryItemId,
             @Param("fechaEntrega") LocalDateTime fechaEntrega,
             @Param("fechaDevolucion") LocalDateTime fechaDevolucion,
-            @Param("estadosIgnorados") List<RentalStatus> estadosIgnorados
+             @Param("estadosBloqueantes") List<RentalStatus> estadosBloqueantes
     );
+
+            @Query("SELECT COUNT(reservation) > 0 FROM Reservation reservation " +
+               "JOIN reservation.reservationItems item " +
+               "WHERE item.inventoryItem.id = :inventoryItemId " +
+               "AND reservation.id <> :reservationId " +
+               "AND reservation.status = :status " +
+               "AND reservation.startDate < :fechaDevolucion " +
+               "AND reservation.endDate > :fechaEntrega")
+            boolean existsOverlappingConfirmedReservation(
+                @Param("inventoryItemId") Long inventoryItemId,
+                @Param("reservationId") Long reservationId,
+                @Param("fechaEntrega") Date fechaEntrega,
+                @Param("fechaDevolucion") Date fechaDevolucion,
+                @Param("status") ReservationStatus status
+            );
 }
 

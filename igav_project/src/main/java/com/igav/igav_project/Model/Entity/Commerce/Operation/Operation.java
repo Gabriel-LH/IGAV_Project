@@ -68,23 +68,41 @@ public class Operation {
     @Column (name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
 
-    @Embedded 
-    @Column (name = "subtotal", nullable = true)
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "subtotal", nullable = true)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "subtotal_currency", length = 3))
+    })
     private Moneda subTotal;
-    @Embedded 
-    @Column (name = "discount_amount", nullable = true)
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "discount_amount", nullable = true)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "discount_currency", length = 3))
+    })
     private Moneda discountAmount;
-    @Embedded 
-    @Column (name = "total_amount", nullable = false)
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "total_amount", nullable = false)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "total_currency", length = 3))
+    })
     private Moneda totalAmount;
-    @Embedded 
-    @Column (name = "rounding_amount", nullable = true)
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "rounding_amount", nullable = true)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "rounding_currency", length = 3))
+    })
     private Moneda roundingAmount;
-    @Embedded 
-    @Column (name = "tax_amount", nullable = true)
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "tax_amount", nullable = true)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "tax_currency", length = 3))
+    })
     private Moneda taxAmount;
-    @Embedded 
-    @Column (name = "total_before_rounding", nullable = true)
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "total_before_rounding", nullable = true)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "total_before_rounding_currency", length = 3))
+    })
     private Moneda totalBeforeRounding;
     @Column (name = "tax_rate", nullable = true)
     private double taxRate;

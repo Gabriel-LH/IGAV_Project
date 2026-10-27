@@ -1,6 +1,5 @@
 package com.igav.igav_project.DTO;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -8,9 +7,7 @@ import java.util.List;
  *
  * @author IGAV Development Team
  */
-public record ReturnOrderRequestDTO(
-    Long orderId,
-    BigDecimal montoPenalizacionMora,
-    List<IncidentRequestDTO> incidencias,
-    String updatedBy
+public record RentalReturnRequestDTO(
+    List<RentalReturnItemRequestDTO> items,
+    String inspectedBy
 ) {}

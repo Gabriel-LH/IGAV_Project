@@ -1,6 +1,6 @@
 package com.igav.igav_project.DTO;
 
-import com.igav.igav_project.Model.Entity.Maintenance.IncidentType;
+import com.igav.igav_project.Model.Entity.Commerce.Rental.ReturnCondition;
 import java.math.BigDecimal;
 
 /**
@@ -8,9 +8,9 @@ import java.math.BigDecimal;
  *
  * @author IGAV Development Team
  */
-public record IncidentRequestDTO(
-    Long garmentId,
-    IncidentType tipoIncidencia,
-    BigDecimal montoDescuentoGarantia,
+public record RentalReturnItemRequestDTO(
+    Long inventoryItemId,
+    ReturnCondition condicionRecibida,
+    BigDecimal cargoDanio,
     String descripcion
 ) {}

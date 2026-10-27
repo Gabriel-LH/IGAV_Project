@@ -1,5 +1,7 @@
 package com.igav.igav_project.DTO;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 /**
  * DTO para el registro y alta de clientes en la base de datos MySQL (RF-06).
  *
@@ -13,5 +15,5 @@ public record CreateCustomerDTO(
     String email,
     String telefono,
     String direccion,
-    Long storeId
+    @JsonAlias("storeId") Long branchId
 ) {}

@@ -17,8 +17,8 @@ public class ModuleFeature {
     @JoinColumn (name = "module_id", nullable = false)
     @ManyToOne (fetch = FetchType.LAZY)
     private Module Module;
+    @Enumerated(EnumType.STRING)
     @Column (name = "plan_feature_key", nullable = false, length = 100)
-    @Embedded 
     private PlanFeatureKey PlanFeatureKey;
     @Column (name = "audit_metadata", nullable = true, columnDefinition = "TEXT")
     @Embedded
