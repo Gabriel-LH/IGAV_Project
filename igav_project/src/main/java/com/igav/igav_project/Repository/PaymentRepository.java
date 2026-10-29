@@ -16,9 +16,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     /**
      * Obtiene todos los pagos realizados dentro de una orden o contrato.
      *
-     * @param orderId ID de la orden.
+     * @param operationId ID de la operacion.
      * @return Lista de pagos.
      */
-    List<Payment> findByOrderId(Long orderId);
+    List<Payment> findByOperationId(Long operationId);
 }
 

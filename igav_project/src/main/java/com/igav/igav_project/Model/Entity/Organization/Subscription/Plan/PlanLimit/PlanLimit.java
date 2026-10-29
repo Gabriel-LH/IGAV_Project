@@ -19,7 +19,7 @@ public class PlanLimit {
     @Column (name = "limit_key", nullable = false, length = 100)
     private PlanLimitKey PlanLimitKey;
 
-    @Column (name = "limit", nullable = false)
+    @Column (name = "limit_value", nullable = false)
     private int Limit;
 
     public PlanLimit() {

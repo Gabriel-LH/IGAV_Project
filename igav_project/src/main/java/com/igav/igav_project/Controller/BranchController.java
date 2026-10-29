@@ -59,7 +59,7 @@ public class BranchController {
      * @return Tienda creada con status 201 Created.
      */
     @PostMapping
-    @Operation(summary = "Registrar nueva tienda/sede", description = "Crea una nueva sede multi-tenant en MySQL (RF-01)")
+    @Operation(summary = "Registrar nueva tienda/sede", description = "Crea una nueva sede multi-tenant (RF-01)")
     @SuppressWarnings("null")
     public ResponseEntity<Branch> createBranch(@RequestBody CreateBranchDTO request) {
         if (request.tenantId() == null || request.code() == null || request.code().isBlank()

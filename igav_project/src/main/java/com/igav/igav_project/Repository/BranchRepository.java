@@ -19,10 +19,10 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     /**
      * Busca una tienda por el número de RUC.
      *
-     * @param rucNumero Número de RUC.
+     * @param code Número de RUC.
      * @return Optional con la tienda si existe.
      */
-    Optional<Branch> findByRucNumero(String rucNumero);
+    Optional<Branch> findByCode(String code);
 
     /**
      * Lista tiendas por estado de suscripción.

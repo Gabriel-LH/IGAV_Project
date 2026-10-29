@@ -16,9 +16,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     /**
      * Obtiene las categorías de prendas registradas por una tienda.
      *
-     * @param storeId ID de la tienda.
+     * @param nombre Nombre de la categoria.
      * @return Lista de categorías.
      */
-    List<Category> findByStoreId(Long storeId);
+    List<Category> findByNombre(String nombre);
 }
 

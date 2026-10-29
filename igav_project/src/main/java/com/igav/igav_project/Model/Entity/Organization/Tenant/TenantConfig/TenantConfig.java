@@ -9,19 +9,28 @@ public class TenantConfig {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column (name = "tenant_config_data", nullable = false, length = 100)
-    @Embedded 
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "loyaltyConfig.enabled", column = @Column(name = "loyalty_enabled")),
+        @AttributeOverride(name = "referralConfig.enabled", column = @Column(name = "referral_enabled")),
+        @AttributeOverride(name = "updatedAt", column = @Column(name = "config_updated_at")),
+        // Agregar aquí cualquier otro 'enabled' de las demás configs si se repiten
+    })
     private TenantConfigData tenantConfigData;
-    @Column (name = "audit_metadata", nullable = false, length = 100)
+    
     @Embedded 
-    private AuditMetadata AuditMetadata;
+    @AttributeOverrides({
+        @AttributeOverride(name = "updatedAt", column = @Column(name = "audit_metadata")),
+        // Agregar aquí cualquier otro 'enabled' de las demás configs si se repiten
+    })
+    private AuditMetadata auditMetadata;
 
 
     public TenantConfig(Long id, TenantConfigData tenantConfigData,
-            AuditMetadata auditMetadata) {
+            AuditMetadata auditMetadata1) {
         this.id = id;
         this.tenantConfigData = tenantConfigData;
-        AuditMetadata = auditMetadata;
+        auditMetadata = auditMetadata1;
     }
 
 
@@ -38,10 +47,10 @@ public class TenantConfig {
         this.tenantConfigData = tenantConfigData;
     }
     public AuditMetadata getAuditMetadata() {
-        return AuditMetadata;
+        return auditMetadata;
     }
-    public void setAuditMetadata(AuditMetadata auditMetadata) {
-        AuditMetadata = auditMetadata;
+    public void setAuditMetadata(AuditMetadata auditMetadata1) {
+        auditMetadata = auditMetadata1;
     }
 
 }

@@ -45,7 +45,7 @@ public class RentalController {
     /**
      * Endpoint para listar los contratos pertenecientes a una tienda específica (Aislamiento por Tenant).
      *
-     * @param storeId ID de la tienda.
+     * @param branchId ID de la tienda.
      * @return Lista de contratos de la tienda.
      */
     @GetMapping("/branch/{branchId}")

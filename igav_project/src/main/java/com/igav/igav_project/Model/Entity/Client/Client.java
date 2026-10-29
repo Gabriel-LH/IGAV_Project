@@ -26,14 +26,14 @@ public class Client {
     private Long id;
 
     @Column (name = "tenant_id", nullable = false, length = 50)
-    public String TenantId;
+    public String tenantId;
     
     @Embedded
     @AttributeOverrides({
       @AttributeOverride(name = "numero", column = @Column(name = "document_id", nullable = false, length = 50)),
       @AttributeOverride(name = "tipo", column = @Column(name = "document_type", nullable = false, length = 50))
     })
-    public DocumentoIdentidad DocumentoIdentidad;
+    public DocumentoIdentidad documentoIdentidad;
     @Embedded
     @AttributeOverrides({
       @AttributeOverride(name = "tipo", column = @Column(name = "person_type", nullable = false, length = 50)),
@@ -41,27 +41,27 @@ public class Client {
       @AttributeOverride(name = "apellidos", column = @Column(name = "last_names", length = 100)),
       @AttributeOverride(name = "razonSocial", column = @Column(name = "business_name", length = 150))
     })
-    public NombrePersona NombrePersona;
+    public NombrePersona nombrePersona;
     @Column (name = "email", nullable = false, length = 100)
-    public String Email;
+    public String email;
     @Column (name = "phone", nullable = true, length = 20)
-    public String Telefono;
+    public String telefono;
     @Enumerated (EnumType.STRING)
     @Column (name = "status", nullable = false)
-    public ClientStatus ClientStatus;
+    public ClientStatus clientStatus;
     @Column (name = "gender", nullable = true, length = 20)
-    public String Genero;
+    public String genero;
     @Column (name = "birth_date", nullable = true)
-    public Date FechaNacimiento;
+    public Date fechaNacimiento;
     @Embedded
-    public Address Address; // O dividir en strings
+    public Address address; // O dividir en strings
     @Column (name = "internal_notes", nullable = true, length = 255)
-    public String InternalNotes;
+    public String internalNotes;
     @Column (name = "metadata", nullable = true, columnDefinition = "TEXT")
     @Builder.Default
-    public String Metadata = "{}"; //Posible metadata mas adelante
+    public String metadata = "{}"; //Posible metadata mas adelante
     @Embedded
-    public AuditMetadata AuditMetadata; // O dividir en strings
+    public AuditMetadata auditMetadata; // O dividir en strings
 
     @OneToMany (mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -73,42 +73,23 @@ public class Client {
     @Builder.Default
     private List<Sale> sales = new ArrayList<>();
     
+    
 
-
-
-    public Client(String tenantId, DocumentoIdentidad documentoIdentidad, NombrePersona nombrePersona, String email,
-            String telefono, ClientStatus clientStatus, String genero,
-            Date fechaNacimiento, Address address, String internalNotes,
-            String metadata, AuditMetadata auditMetadata) {
-        
-        TenantId = tenantId;
-        DocumentoIdentidad = documentoIdentidad;
-        NombrePersona = nombrePersona;
-        Email = email;
-        Telefono = telefono;
-        ClientStatus = clientStatus;
-        Genero = genero;
-        FechaNacimiento = fechaNacimiento;
-        Address = address;
-        InternalNotes = internalNotes;
-        Metadata = metadata;
-        AuditMetadata = auditMetadata;
-    }
   /**
      * Método de fábrica estático para instanciar contratos u órdenes.
      *
-     * @param TenantId Id del tenant.
-     * @param DocumentoIdentidad Número de documento de identidad.
-     * @param NombrePersona Nombre de la persona.
-     * @param Email Email de la persona.
-     * @param Telefono Teléfono de la persona.
-     * @param ClientStatus Estado del cliente (activo/inactivo).
-     * @param Genero Género de la persona.
-     * @param FechaNacimiento Fecha de nacimiento de la persona.
-     * @param Address Dirección de la persona.
-     * @param InternalNotes Notas internas.
-     * @param Metadata Metadatos.
-     * @param AuditMetadata Metadatos de auditoría.
+     * @param tenantId Id del tenant.
+     * @param documentoIdentidad Número de documento de identidad.
+     * @param nombrePersona Nombre de la persona.
+     * @param email Email de la persona.
+     * @param telefono Teléfono de la persona.
+     * @param clientStatus Estado del cliente (activo/inactivo).
+     * @param genero Género de la persona.
+     * @param fechaNacimiento Fecha de nacimiento de la persona.
+     * @param address Dirección de la persona.
+     * @param internalNotes Notas internas.
+     * @param metadata Metadatos.
+     * @param auditMetadata Metadatos de auditoría.
      * @return Nueva instancia de {@link Client}.
      */
     public static Client create(
@@ -139,43 +120,12 @@ public class Client {
             auditMetadata
         );
     }
-  public Long getId() {
-    return id;
+
+
+
+  public Client(String tenantId2, DocumentoIdentidad documentoIdentidad2, NombrePersona nombrePersona2, String email2,
+        String telefono2, ClientStatus clientStatus2, String genero2, Date fechaNacimiento2, Address address2,
+        String internalNotes2, String metadata2, AuditMetadata auditMetadata2) {
   }
-  public String getTenantId() {
-    return TenantId;
-  }
-  public DocumentoIdentidad getDocumentoIdentidad() {
-    return DocumentoIdentidad;
-  }
-  public NombrePersona getNombrePersona() {
-    return NombrePersona;
-  }
-  public String getEmail() {
-    return Email;
-  }
-  public String getTelefono() {
-    return Telefono;
-  }
-  public ClientStatus getClientStatus() {
-    return ClientStatus;
-  }
-  public String getGenero() {
-    return Genero;
-  }
-  public Date getFechaNacimiento() {
-    return FechaNacimiento;
-  }
-  public Address getAddress() {
-    return Address;
-  }
-  public String getInternalNotes() {
-    return InternalNotes;
-  }
-  public String getMetadata() {
-    return Metadata;
-  }
-  public AuditMetadata getAuditMetadata() {
-    return AuditMetadata;
-  }
+
 }

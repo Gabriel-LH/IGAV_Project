@@ -52,11 +52,26 @@ public class ReservationItem {
 
     @Column (name = "quantity", nullable = false)
     private float quantity;
-    @Column (name = "price_at_moment", nullable = false)
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "price_at_moment", nullable = false)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "price_at_moment_currency", nullable = false))
+    })
     private Moneda priceAtMoment;
-    @Column (name = "list_price", nullable = true)
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "list_price", nullable = true)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "list_price_currency", nullable = true))
+    })
     private Moneda listPrice;
-    @Column (name = "total_discount", nullable = false)
+
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "monto", column = @Column(name = "total_discount", nullable = false)),
+        @AttributeOverride(name = "tipoMoneda.codigo", column = @Column(name = "total_discount_currency", nullable = false))
+    })
     private Moneda totalDiscount;
     @Column (name = "discount_reason")
     private String discountReason;
