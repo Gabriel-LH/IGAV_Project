@@ -11,13 +11,17 @@ import com.igav.igav_project.Model.Entity.Client.ClientStatus;
 import com.igav.igav_project.Model.Shared.ValueObjects.AuditMetadata;
 import com.igav.igav_project.Repository.BranchRepository;
 import com.igav.igav_project.Repository.ClientRepository;
+import com.igav.igav_project.Service.ClientReportService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,6 +38,7 @@ public class ClientController {
 
     private final ClientRepository clientRepository;
     private final BranchRepository branchRepository;
+    private final ClientReportService clientReportService;
 
     /**
      * Constructor con inyección de dependencias para los repositorios.
@@ -41,9 +46,13 @@ public class ClientController {
      * @param clientRepository Repositorio JPA de {@link Client}.
      * @param branchRepository Repositorio JPA de {@link Branch}.
      */
-    public ClientController(ClientRepository clientRepository, BranchRepository branchRepository) {
+    public ClientController(
+            ClientRepository clientRepository,
+            BranchRepository branchRepository,
+            ClientReportService clientReportService) {
         this.clientRepository = clientRepository;
         this.branchRepository = branchRepository;
+        this.clientReportService = clientReportService;
     }
 
     /**
@@ -55,6 +64,23 @@ public class ClientController {
     @Operation(summary = "Listar todos los clientes", description = "Obtiene el directorio completo de clientes registrados en el sistema")
     public ResponseEntity<List<Client>> getAllCustomers() {
         return ResponseEntity.ok(clientRepository.findAll());
+    }
+
+    /**
+     * Descarga un reporte Excel con los datos básicos de todos los clientes.
+     *
+     * @return Archivo XLSX adjunto con el listado de clientes.
+     * @throws IOException si ocurre un error al generar el archivo.
+     */
+    @GetMapping(value = "/report.xlsx", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    @Operation(summary = "Exportar clientes a Excel", description = "Descarga el listado de clientes en formato XLSX")
+    public ResponseEntity<byte[]> exportCustomersExcel() throws IOException {
+        byte[] report = clientReportService.generateExcelReport();
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=clientes.xlsx")
+                .body(report);
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.igav.igav_project.Model.Shared.ValueObjects;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,16 +27,11 @@ public record DocumentoIdentidad(
      * @throws IllegalArgumentException si los datos son nulos o no cumplen la longitud requerida.
      */
     public DocumentoIdentidad {
-        if (tipo == null || numero == null || numero.isBlank()) {
-            throw new IllegalArgumentException("El tipo y número de documento son obligatorios.");
-        }
-        
-        if (tipo == TipoDocumento.DNI && !numero.matches("\\d{8}")) {
-            throw new IllegalArgumentException("El DNI debe tener exactamente 8 dígitos numéricos.");
-        }
-
-        if (tipo == TipoDocumento.RUC && !numero.matches("\\d{11}")) {
-            throw new IllegalArgumentException("El RUC debe tener exactamente 11 dígitos numéricos.");
-        }
+        checkArgument(tipo != null && numero != null && !numero.isBlank(),
+                "El tipo y número de documento son obligatorios.");
+        checkArgument(tipo != TipoDocumento.DNI || numero.matches("\\d{8}"),
+                "El DNI debe tener exactamente 8 dígitos numéricos.");
+        checkArgument(tipo != TipoDocumento.RUC || numero.matches("\\d{11}"),
+                "El RUC debe tener exactamente 11 dígitos numéricos.");
     }
 }

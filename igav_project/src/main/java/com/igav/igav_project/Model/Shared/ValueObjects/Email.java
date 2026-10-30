@@ -1,6 +1,8 @@
 package com.igav.igav_project.Model.Shared.ValueObjects;
 
 import jakarta.persistence.Embeddable;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Pattern;
 
 /**
@@ -25,11 +27,11 @@ public record Email(String email) {
      * @throws IllegalArgumentException si el email es nulo, está vacío o no cumple con el formato válido.
      */
     public Email {
-        if (email == null || email.isBlank()) {
+         if (StringUtils.isBlank(email)) {
             throw new IllegalArgumentException("El correo electrónico no puede ser nulo o estar vacío.");
         }
         
-        email = email.trim().toLowerCase();
+         email = StringUtils.trim(email).toLowerCase();
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
             throw new IllegalArgumentException("El formato del correo electrónico no es válido: " + email);

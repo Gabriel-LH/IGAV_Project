@@ -50,6 +50,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 // Métodos preflight de CORS
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // El reporte contiene datos personales de clientes.
+                .requestMatchers(HttpMethod.GET, "/api/v1/customers/report.xlsx").authenticated()
                 // Permitir lectura general para catálogo y tiendas
                 .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                 // Operaciones de negocio protegidas
@@ -81,5 +83,4 @@ public class SecurityConfig {
         return source;
     }
 }
-
 
